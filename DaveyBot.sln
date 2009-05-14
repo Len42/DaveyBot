@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaveyBotApp", "DaveyBotApp\DaveyBotApp.csproj", "{F0F17F72-9CF8-48C3-BB3A-87661A4AB026}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A0BEBB1C-14DB-4123-A4F0-0487CD022E14}"
+	ProjectSection(SolutionItems) = preProject
+		License.html = License.html
+		Readme.html = Readme.html
+		DaveyBotApp\xmldoc.css = DaveyBotApp\xmldoc.css
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{32966F53-B89C-470C-BE95-6A0424120B7E}"
+	ProjectSection(SolutionItems) = preProject
+		tools\makehtmldoc.bat = tools\makehtmldoc.bat
+		tools\xmldoc.xsl = tools\xmldoc.xsl
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F0F17F72-9CF8-48C3-BB3A-87661A4AB026}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0F17F72-9CF8-48C3-BB3A-87661A4AB026}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0F17F72-9CF8-48C3-BB3A-87661A4AB026}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0F17F72-9CF8-48C3-BB3A-87661A4AB026}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
