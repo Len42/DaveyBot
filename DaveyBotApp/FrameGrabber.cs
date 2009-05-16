@@ -45,8 +45,8 @@ namespace DaveyBot
 		private int m_cframe = 0;
 
 		/// <summary>The grabbed video frames</summary>
-		public VideoFrame[] Frames { get { return m_rgframe; } }
-		private VideoFrame[] m_rgframe = null;
+		public VideoFrameGrab[] Frames { get { return m_rgframe; } }
+		private VideoFrameGrab[] m_rgframe = null;
 
 		/// <summary>Lock object to protect the collection of video frames</summary>
 		private object oLockFrames = new Object();
@@ -84,7 +84,7 @@ namespace DaveyBot
 			{
 				lock (oLockFrames)
 				{
-					m_rgframe = new VideoFrame[m_cframeAlloc];
+					m_rgframe = new VideoFrameGrab[m_cframeAlloc];
 					m_cframe = 0;
 				}
 				// Listen for Eyes events.
@@ -138,7 +138,7 @@ namespace DaveyBot
 				}
 				else
 				{
-					VideoFrame frame = new VideoFrame(args.FrameSampleTime,
+					VideoFrameGrab frame = new VideoFrameGrab(args.FrameSampleTime,
 											  m_eyes.VideoWidth, m_eyes.VideoHeight,
 											  m_eyes.PixelDepth, m_eyes.VideoStride,
 											  args.FrameBuf, args.FrameBufSize);
@@ -167,7 +167,7 @@ namespace DaveyBot
 		{
 			// This is time-consuming, so we will not lock m_rgframe for the whole operation.
 			// Instead we will grab m_rgframe and set it to null, then release the lock.
-			VideoFrame[] rgframe = null;
+			VideoFrameGrab[] rgframe = null;
 			int cframe = 0;
 			lock (oLockFrames)
 			{
@@ -187,7 +187,7 @@ namespace DaveyBot
 				// Write out all captured images to separate files.
 				for (int i = 0; i < cframe; i++)
 				{
-					VideoFrame frame = rgframe[i];
+					VideoFrameGrab frame = rgframe[i];
 					// Convert the raw pixels to a proper bitmap.
 					// TODO: PixelFormat - for now, it's assumed
 					IntPtr hPixels = Marshal.AllocHGlobal(frame.NumBytes);

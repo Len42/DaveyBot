@@ -25,11 +25,15 @@ using System.Runtime.InteropServices;
 namespace DaveyBot
 {
 	/// <summary>
-	/// TODO
+	/// Stores a video image bitmap for the <see cref="FrameGrabber"/>.
 	/// </summary>
-	public struct VideoFrame
+	/// <remarks>
+	/// Unlike <see cref="VideoFrame"/>, this class copies the bitmap data into
+	/// its own byte[].
+	/// </remarks>
+	public struct VideoFrameGrab
 	{
-		public VideoFrame(double tSample, int dx, int dy, int cb1Pix, int cbStride, IntPtr buf, int cbBuf)
+		public VideoFrameGrab(double tSample, int dx, int dy, int cb1Pix, int cbStride, IntPtr buf, int cbBuf)
 		{
 			m_tSample = tSample;
 			m_dx = dx;

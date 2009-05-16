@@ -124,12 +124,11 @@ namespace DaveyBot
 				// Figure out the delay between the detection of a note and when to play it.
 				// This includes the delay defined by the note detection algorithm
 				// and a delay defined by the user.
-				double dtFrameDelaySecs = m_noteFinder.NumFramesDelay / 30.0;
+				double dtFrameDelaySecs = m_noteFinder.NumFramesDelay * m_eyes.VideoFrameInterval;
 				// NOTE: NoteLagAdjust is subtracted, not added, so it will appear as a
 				// positive number in the Settings dialog.
 				m_dtNoteDelay = new TimeSpan((long)(dtFrameDelaySecs * 10000000
 									- Properties.Settings.Default.NoteLagAdjust * 10000));
-
 				m_fDelayStrum = Properties.Settings.Default.DelayStrum;
 				m_fStrumPending = false;
 				m_state = new AnalyzeState();

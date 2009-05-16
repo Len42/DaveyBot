@@ -75,6 +75,10 @@ namespace DaveyBot
 		public int VideoStride { get { return m_cbVideoStride; } }
 		private int m_cbVideoStride = 0;
 
+		/// <summary>Time interval between video frames, in seconds</summary>
+		public double VideoFrameInterval { get { return m_dtVideoFrameSecs; } }
+		private double m_dtVideoFrameSecs = 0;
+
 		/// <summary>Is live video currently running?</summary>
 		public bool IsVideoPlaying { get { return m_fPlaying; } }
 		private bool m_fPlaying = false;
@@ -294,6 +298,7 @@ namespace DaveyBot
 		{
             object o = null;
 			ICaptureGraphBuilder2 captureGraphBuilder = null;
+            IBasicVideo2 basicVideo2 = null;
 			IBaseFilter bfVideoSource = null;
             AMMediaType mediaType = null;
             ISampleGrabber grabber = null;
@@ -314,6 +319,7 @@ namespace DaveyBot
                 m_graph = (IGraphBuilder)new FilterGraph();
                 captureGraphBuilder = (ICaptureGraphBuilder2)new CaptureGraphBuilder2();
                 Check(captureGraphBuilder.SetFiltergraph(m_graph));
+                basicVideo2 = (IBasicVideo2)m_graph;
 
                 // Create the video input device and add it to the graph.
                 bfVideoSource = CreateFilter(FilterCategory.VideoInputDevice, m_stVideoSourceName);
@@ -364,6 +370,7 @@ namespace DaveyBot
                 m_dyVideo = videoInfoHeader.BmiHeader.Height;
                 m_cb1Pix = videoInfoHeader.BmiHeader.BitCount / 8;
                 m_cbVideoStride = m_dxVideo * m_cb1Pix;
+				Check(basicVideo2.get_AvgTimePerFrame(out m_dtVideoFrameSecs));
 
                 // Also, we can now get the crossbar, which will be needed to select the video input.
                 int hr = captureGraphBuilder.FindInterface(null, null, bfVideoSource, typeof(IAMCrossbar).GUID, out o);
@@ -397,6 +404,7 @@ namespace DaveyBot
 			{
 				// DirectShowNET objects have to be explicitly released.
 				ReleaseCOM(captureGraphBuilder);
+                //ReleaseCOM(basicVideo2); - no, this messes up m_graph
 				ReleaseCOM(bfVideoSource);
 				ReleaseCOM(grabber);
 				//ReleaseCOM(bfGrabber);
