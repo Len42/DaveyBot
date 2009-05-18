@@ -47,7 +47,7 @@ namespace DaveyBot
 		private bool fStrum = false; // if fFound, should it be strummed or not?
 
 		/// <summary>Is the detected note part of an "energy phrase"?</summary>
-		/// <remarks>TODO: currently unused</remarks>
+		/// <todo>currently unused</todo>
 		public bool Energy { get { return fEnergy; } set { fEnergy = value; } }
 		private bool fEnergy = false;
 

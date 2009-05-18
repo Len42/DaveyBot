@@ -136,8 +136,8 @@ namespace DaveyBot
 		/// <para>Most of the buttons maintain their pressed/not-pressed state
 		/// until the next command is sent, except the strum button will only be
 		/// pressed momentarily.</para>
-		/// <para>TODO: The overdrive control and whammy bar are not yet supported.</para>
 		/// </remarks>
+		/// <todo>The overdrive control and whammy bar are not yet supported.</todo>
 		/// <param name="ev">Specifies which buttons to press and release</param>
 		private void WriteCommandPlayNotes(PlayNotesArgs ev)
 		{

@@ -118,6 +118,7 @@
 
         <xsl:apply-templates select="summary"/>
         <xsl:apply-templates select="remarks"/>
+        <xsl:apply-templates select="todo"/>
         <xsl:apply-templates select="seealso"/>
 
         <!-- Display parameters if there are any -->
@@ -224,6 +225,13 @@
 
 <xsl:template match="summary">
   <xsl:call-template name="paragraphs"/>
+</xsl:template>
+
+<xsl:template match="todo">
+  <div class="todo">
+    <h5>TODO:</h5>
+    <xsl:call-template name="paragraphs"/>
+  </div>
 </xsl:template>
 
 <xsl:template match="list">

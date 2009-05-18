@@ -29,10 +29,10 @@ namespace DaveyBot
 	/// Hammer-on/pull-off notes are shorter than regular notes,
 	/// so each type will have its own NoteDef2.
 	/// </remarks>
+	/// <todo>Look at the right-hand end of the note too perhaps?</todo>
 	class NoteDef2
 	{
 		public int xLeft;
-		// TODO: the right-hand end of the note too perhaps?
 		public int yTop;
 		public int dx;
 		public int dy;

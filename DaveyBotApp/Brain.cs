@@ -219,8 +219,8 @@ namespace DaveyBot
 		/// <para>If no notes were detected, don't send an event. That means that after
 		/// a note button is pressed, it will stay pressed until the next note appears.
 		/// Thus sustained notes are held without having to explictly detect them.</para>
-		/// <para>TODO: overdrive/star power; whammy bar</para>
 		/// </remarks>
+		/// <todo>overdrive/star power; whammy bar</todo>
 		/// <param name="tFrame">Timestamp of the video frame</param>
 		private void ExecuteActions(DateTime tFrame)
 		{
