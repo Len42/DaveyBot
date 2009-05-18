@@ -25,17 +25,24 @@ using System.Runtime.InteropServices;
 namespace DaveyBot
 {
 	/// <summary>
-	/// TODO
+	/// A video image bitmap that was captured by <see cref="Eyes"/>.
 	/// </summary>
+	/// <remarks>
+	/// <para>The bitmap data buffer is represented by an IntPtr which is NOT freed
+	/// when this object is destroyed.</para>
+	/// <para>This class can represent either sub-frame of an interlaced bitmap,
+	/// by setting Start and Stride appropriately.</para>
+	/// </remarks>
 	public struct VideoFrame
 	{
-		public VideoFrame(double tSample, int dx, int dy, int cb1Pix, int cbStride, IntPtr buf, int cbBuf)
+		public VideoFrame(double tSample, int dx, int dy, int cb1Pix, int cbStride, int ibStart, IntPtr buf, int cbBuf)
 		{
 			m_tSample = tSample;
 			m_dx = dx;
 			m_dy = dy;
 			m_cb1Pix = cb1Pix;
 			m_cbStride = cbStride;
+			m_ibStart = ibStart;
 			System.Diagnostics.Debug.Assert(dx * dy * 3 == cbBuf);
 			m_pbPixels = new byte[cbBuf];
 			Marshal.Copy(buf, m_pbPixels, 0, cbBuf);
@@ -61,8 +68,20 @@ namespace DaveyBot
 		/// Bitmap image stride, i.e. the number of bytes from the start of
 		/// one horizontal line to the next.
 		/// </summary>
+		/// <remarks>
+		/// Start and Stride can be used to select one sub-image in an interlaced image.
+		/// </remarks>
 		public int Stride { get { return m_cbStride; } }
 		private int m_cbStride;
+
+		/// <summary>
+		/// Byte offset to start of the image.
+		/// </summary>
+		/// <remarks>
+		/// Start and Stride can be used to select one sub-image in an interlaced image.
+		/// </remarks>
+		public int Start { get { return m_ibStart; } }
+		private int m_ibStart;
 
 		/// <summary>Number of bytes in the image bitmap</summary>
 		public int NumBytes { get { return m_dx * m_dy * m_cb1Pix; } }
