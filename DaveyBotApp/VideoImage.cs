@@ -32,10 +32,11 @@ namespace DaveyBot
 	/// when this object is destroyed.</para>
 	/// <para>This class can represent either sub-frame of an interlaced bitmap,
 	/// by setting Start and Stride appropriately.</para>
+	/// <para>Derived from EventArgs so it can be used in events.</para>
 	/// </remarks>
-	public struct VideoFrame
+	public class VideoImage : EventArgs
 	{
-		public VideoFrame(double tSample, int dx, int dy, int cb1Pix, int cbStride, int ibStart, IntPtr buf, int cbBuf)
+		public VideoImage(DateTime tSample, int dx, int dy, int cb1Pix, int cbStride, int ibStart, IntPtr buf, int cbBuf)
 		{
 			m_tSample = tSample;
 			m_dx = dx;
@@ -43,14 +44,13 @@ namespace DaveyBot
 			m_cb1Pix = cb1Pix;
 			m_cbStride = cbStride;
 			m_ibStart = ibStart;
-			System.Diagnostics.Debug.Assert(dx * dy * 3 == cbBuf);
-			m_pbPixels = new byte[cbBuf];
-			Marshal.Copy(buf, m_pbPixels, 0, cbBuf);
+			m_buf = buf;
+			m_cbBuf = cbBuf;
 		}
 
 		/// <summary>Timestamp of the video image</summary>
-		public double SampleTime { get { return m_tSample; } }
-		private double m_tSample;
+		public DateTime SampleTime { get { return m_tSample; } }
+		private DateTime m_tSample;
 
 		/// <summary>Width of the image in pixels</summary>
 		public int Width { get { return m_dx; } }
@@ -85,9 +85,22 @@ namespace DaveyBot
 
 		/// <summary>Number of bytes in the image bitmap</summary>
 		public int NumBytes { get { return m_dx * m_dy * m_cb1Pix; } }
+		private int m_cbBuf;
 
 		/// <summary>The image pixels, as an array of bytes</summary>
-		public byte[] Pixels { get { return m_pbPixels; } }
-		private byte[] m_pbPixels;
+		public IntPtr ImageData { get { return m_buf; } }
+		private IntPtr m_buf;
+
+		/// <summary>
+		/// Split an interlaced video image into its two component sub-images.
+		/// </summary>
+		/// <param name="dtFrameInterval">Time interval between video sub-frames</param>
+		/// <param name="imageOut0"></param>
+		/// <param name="imageOut1"></param>
+		public void Deinterlace(TimeSpan dtFrameInterval, out VideoImage imageOut0, out VideoImage imageOut1)
+		{
+			imageOut1 = new VideoImage(SampleTime + dtFrameInterval, Width, Height / 2, BytesPerPixel, 2 * Stride, Stride, ImageData, NumBytes);
+			imageOut0 = new VideoImage(SampleTime, Width, Height - imageOut1.Height, BytesPerPixel, 2 * Stride, 0, ImageData, NumBytes);
+		}
 	}
 }

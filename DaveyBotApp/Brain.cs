@@ -124,11 +124,10 @@ namespace DaveyBot
 				// Figure out the delay between the detection of a note and when to play it.
 				// This includes the delay defined by the note detection algorithm
 				// and a delay defined by the user.
-				double dtFrameDelaySecs = m_noteFinder.NumFramesDelay * m_eyes.VideoFrameInterval;
 				// NOTE: NoteLagAdjust is subtracted, not added, so it will appear as a
 				// positive number in the Settings dialog.
-				m_dtNoteDelay = new TimeSpan((long)(dtFrameDelaySecs * 10000000
-									- Properties.Settings.Default.NoteLagAdjust * 10000));
+				m_dtNoteDelay = new TimeSpan(m_eyes.VideoFrameInterval.Ticks * m_noteFinder.NumFramesDelay
+											- Properties.Settings.Default.NoteLagAdjust * 10000);
 				m_fDelayStrum = Properties.Settings.Default.DelayStrum;
 				m_fStrumPending = false;
 				m_state = new AnalyzeState();
@@ -148,40 +147,32 @@ namespace DaveyBot
 		/// Event handler that processes video frames.
 		/// </summary>
 		/// <param name="sender"></param>
-		/// <param name="args"></param>
-		protected void eyes_VideoFrame(object sender, VideoFrameArgs args)
+		/// <param name="frame"></param>
+		protected void eyes_VideoFrame(object sender, VideoImage frame)
 		{
 			if (m_fIsRunning)
 			{
-				DateTime tFrame = DateTime.Now;
-				IntPtr buf = args.FrameBuf;
-				int cbBuf = args.FrameBufSize;
 				Color clrFill;
 				Color clrYes = Color.FromArgb(0, 255, 0);
 				Color clrNo = Color.Black;
 
 				// Analyze the video frame to see if any notes have hit.
-				AnalyzeFrame(buf, cbBuf, m_eyes.VideoHeight, m_eyes.VideoStride, m_eyes.PixelDepth, m_state);
+				AnalyzeFrame(frame, m_state);
 
 				// DEBUG: Mark detected notes on the live video frame.
 				clrFill = m_state.Green.Found ? clrYes : clrNo;
-				FillRect(234 - 12, 24, 364 + 24, 10, clrFill, buf, cbBuf,
-						m_eyes.VideoWidth, m_eyes.VideoHeight, m_eyes.VideoStride, m_eyes.PixelDepth);
+				FillRect(234 - 12, 24, 364 + 24, 10, clrFill, frame);
 				clrFill = m_state.Red.Found ? clrYes : clrNo;
-				FillRect(297 - 12, 24, 364 + 24, 10, clrFill, buf, cbBuf,
-						m_eyes.VideoWidth, m_eyes.VideoHeight, m_eyes.VideoStride, m_eyes.PixelDepth);
+				FillRect(297 - 12, 24, 364 + 24, 10, clrFill, frame);
 				clrFill = m_state.Yellow.Found ? clrYes : clrNo;
-				FillRect(360 - 12, 24, 364 + 24, 10, clrFill, buf, cbBuf,
-						m_eyes.VideoWidth, m_eyes.VideoHeight, m_eyes.VideoStride, m_eyes.PixelDepth);
+				FillRect(360 - 12, 24, 364 + 24, 10, clrFill, frame);
 				clrFill = m_state.Blue.Found ? clrYes : clrNo;
-				FillRect(423 - 12, 24, 364 + 24, 10, clrFill, buf, cbBuf,
-						m_eyes.VideoWidth, m_eyes.VideoHeight, m_eyes.VideoStride, m_eyes.PixelDepth);
+				FillRect(423 - 12, 24, 364 + 24, 10, clrFill, frame);
 				clrFill = m_state.Orange.Found ? clrYes : clrNo;
-				FillRect(482 - 12, 24, 364 + 24, 10, clrFill, buf, cbBuf,
-						m_eyes.VideoWidth, m_eyes.VideoHeight, m_eyes.VideoStride, m_eyes.PixelDepth);
+				FillRect(482 - 12, 24, 364 + 24, 10, clrFill, frame);
 
 				// Figure out which buttons to press based on the analysis.
-				ExecuteActions(tFrame);
+				ExecuteActions(frame.SampleTime);
 
 			}
 		}
@@ -192,18 +183,12 @@ namespace DaveyBot
 		/// <remarks>
 		/// Calls a <see cref="DaveyBot.NoteFinder"/> object that implements the particular note-detection algorithm.
 		/// </remarks>
-		/// <param name="buf">Bitmap video image, as a raw byte buffer</param>
-		/// <param name="cbBuf">Size of image buffer</param>
-		/// <param name="dyVideo">Bitmap height in pixels</param>
-		/// <param name="cbVideoStride">Bitmap raster stride length</param>
-		/// <param name="cb1Pix">Number of bytes per pixel (typically 3)</param>
+		/// <param name="frame">Video image bitmap</param>
 		/// <param name="state">Current analysis state</param>
-		private void AnalyzeFrame(IntPtr buf, int cbBuf,
-								  int dyVideo, int cbVideoStride, int cb1Pix,
-								  AnalyzeState state)
+		private void AnalyzeFrame(VideoImage frame, AnalyzeState state)
 		{
 			state.InitNextFrame();
-			m_noteFinder.AnalyzeImage(buf, cbBuf, dyVideo, cbVideoStride, cb1Pix, state);
+			m_noteFinder.AnalyzeImage(frame, state);
 		}
 
 		/// <summary>
@@ -286,42 +271,37 @@ namespace DaveyBot
 		/// <param name="y">Rectangle top position</param>
 		/// <param name="dy">Rectangle height</param>
 		/// <param name="clr">Rectangle colour</param>
-		/// <param name="buf">Bitmap video image, as a raw byte buffer</param>
-		/// <param name="cbBuf">Size of image buffer</param>
-		/// <param name="dxVideo">Bitmap width in pixels</param>
-		/// <param name="dyVideo">Bitmap height in pixels</param>
-		/// <param name="cbVideoStride">Bitmap raster stride length</param>
-		/// <param name="cb1Pix">Number of bytes per pixel (typically 3)</param>
-		private unsafe void FillRect(int x, int dx, int y, int dy, Color clr,
-									 IntPtr buf, int cbBuf,
-									 int dxVideo, int dyVideo, int cbVideoStride, int cb1Pix)
+		/// <param name="frame">Video image bitmap</param>
+		private unsafe void FillRect(int x, int dx, int y, int dy, Color clr, VideoImage frame)
 		{
-			byte* pbBuf = (byte*)buf;
+			byte* pbBuf = (byte*)frame.ImageData;
 			byte R = clr.R; // cache these values because they're used in loops
 			byte G = clr.G;
 			byte B = clr.B;
 
-			if (dxVideo <= 0 || dyVideo <= 0 || cb1Pix <= 0 || cbVideoStride <= 0)
+			if (frame.Width <= 0 || frame.Height <= 0 || frame.BytesPerPixel <= 0 || frame.Stride <= 0)
 			{
 				// Error - video sizes not initialized
 				// (don't throw an exception for these errors because they may repeat on every video frame)
 			}
-			else if (x < 0 || x + dx >= dxVideo || y < 0 || y + dy >= dyVideo)
+			else if (x < 0 || x + dx >= frame.Width || y < 0 || y + dy >= frame.Height)
 			{
 				// Error - invalid rectangle coords
 			}
-			else if (dxVideo * dyVideo * cb1Pix != cbBuf)
+			else if (frame.NumBytes != 3)
 			{
-				// Error - image buffer is the wrong size
+				// Error - we can't handle this video format
 			}
 			else
 			{
 				// Flip top & bottom
-				y = dyVideo - y - dy;
+				y = frame.Height - y - dy;
 				int ibCur;
 				int ibStart;
 				int ibEnd;
-				ibStart = y * cbVideoStride + x * cb1Pix;
+				int cb1Pix = frame.BytesPerPixel;
+				int cbStride = frame.Stride;
+				ibStart = frame.Start + y * frame.Stride + x * cb1Pix;
 				for (int i = 0; i < dy; i++)
 				{
 					ibEnd = ibStart + dx * cb1Pix;
@@ -332,7 +312,7 @@ namespace DaveyBot
 						pbBuf[ibCur + 1] = G;
 						pbBuf[ibCur + 2] = R;
 					}
-					ibStart += cbVideoStride;
+					ibStart += cbStride;
 				}
 			}
 		}
@@ -417,11 +397,12 @@ namespace DaveyBot
 			Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
 			BitmapData data = bmp.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
 			// NOTE: we only support Format24bppRgb
-			int cb1Pix = 3; 
 			if (data.PixelFormat != PixelFormat.Format24bppRgb)
 				throw new ApplicationException("Unsupported bitmap file format");
+			VideoImage image = new VideoImage(DateTime.Now, data.Width, data.Height, 3, data.Stride, 0, data.Scan0,
+											  data.Height * data.Stride);
 			// Analyze the image.
-			AnalyzeFrame(data.Scan0, data.Height * data.Stride, data.Height, data.Stride, cb1Pix, state);
+			AnalyzeFrame(image, state);
 			bmp.UnlockBits(data);
 			bmp.Dispose();
 		}

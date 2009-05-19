@@ -53,25 +53,13 @@ namespace DaveyBot
 
 		override public int NumFramesDelay { get { return 5; } }
 
-		override public void AnalyzeImage(IntPtr buf, int cbBuf,
-										int dyImage, int cbImageStride, int cb1Pix,
-										AnalyzeState state)
+		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
 		{
-			DetectNote(state.Green, m_notedefGreenStrum, m_notedefGreenHopo,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Red, m_notedefRedStrum, m_notedefRedHopo,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Yellow, m_notedefYellowStrum, m_notedefYellowHopo,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Blue, m_notedefBlueStrum, m_notedefBlueHopo,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Orange, m_notedefOrangeStrum, m_notedefOrangeHopo,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
+			DetectNote(state.Green, m_notedefGreenStrum, m_notedefGreenHopo, image);
+			DetectNote(state.Red, m_notedefRedStrum, m_notedefRedHopo, image);
+			DetectNote(state.Yellow, m_notedefYellowStrum, m_notedefYellowHopo, image);
+			DetectNote(state.Blue, m_notedefBlueStrum, m_notedefBlueHopo, image);
+			DetectNote(state.Orange, m_notedefOrangeStrum, m_notedefOrangeHopo, image);
 
 #if false // TODO: This doesn't work. Try something else.
 			// Try to ignore the flash of yellow lines when an energy phrase is conpleted.
@@ -89,7 +77,7 @@ namespace DaveyBot
 
 			// DEBUG
 			//NoteFinder nfOther = new NoteFinderTest();
-			//DelegateTest(nfOther, buf, cbBuf, dyImage, cbImageStride, cb1Pix, state);
+			//DelegateTest(nfOther, image, state);
 		}
 
 		/// <summary>
@@ -103,19 +91,14 @@ namespace DaveyBot
 		/// which will be updated if that note is detected</param>
 		/// <param name="notedefStrummed">Description of the note being sought</param>
 		/// <param name="notedefHopo">Description of the hammer-on version of the note</param>
-		/// <param name="buf">Bitmap video image, as a raw byte buffer</param>
-		/// <param name="cbBuf">Size of image buffer</param>
-		/// <param name="dyImage">Bitmap height in pixels</param>
-		/// <param name="cbImageStride">Bitmap raster stride length</param>
-		/// <param name="cb1Pix">Number of bytes per pixel (typically 3)</param>
+		/// <param name="image">Image bitmap</param>
 		private void DetectNote(NoteState note,
 								NoteDef2 notedefStrummed, NoteDef2 notedefHopo,
-								IntPtr buf, int cbBuf,
-								int dyImage, int cbImageStride, int cb1Pix)
+								VideoImage image)
 		{
 			note.Strum = false;
 			// Look for a regular strummed note.
-			DetectNoteHelper(note, notedefStrummed, buf, cbBuf, dyImage, cbImageStride, cb1Pix);
+			DetectNoteHelper(note, notedefStrummed, image);
 			if (note.Found)
 			{
 				note.Strum = true; // found a strummed note
@@ -123,7 +106,7 @@ namespace DaveyBot
 			else
 			{
 				// Look for a not-strummed note.
-				DetectNoteHelper(note, notedefHopo, buf, cbBuf, dyImage, cbImageStride, cb1Pix);
+				DetectNoteHelper(note, notedefHopo, image);
 			}	
 		}
 
@@ -138,15 +121,10 @@ namespace DaveyBot
 		/// <param name="note">State of the particular note (green, red, etc.)
 		/// which will be updated if that note is detected</param>
 		/// <param name="notedef">Description of the note being sought</param>
-		/// <param name="buf">Bitmap video image, as a raw byte buffer</param>
-		/// <param name="cbBuf">Size of image buffer</param>
-		/// <param name="dyImage">Bitmap height in pixels</param>
-		/// <param name="cbImageStride">Bitmap raster stride length</param>
-		/// <param name="cb1Pix">Number of bytes per pixel (typically 3)</param>
+		/// <param name="image">Image bitmap</param>
 		private unsafe void DetectNoteHelper(NoteState note,
 											NoteDef2 notedef,
-											IntPtr buf, int cbBuf,
-											int dyImage, int cbImageStride, int cb1Pix)
+											VideoImage image)
 		{
 			note.RValue = 0;
 			//note.gValue unused
@@ -154,8 +132,10 @@ namespace DaveyBot
 
 			int xStart = notedef.xLeft;
 			int yStart = notedef.yTop;
-			yStart = dyImage - yStart - notedef.dy; // flip top-bottom
-			byte* pbBuf = (byte*)buf;
+			yStart = image.Height - yStart - notedef.dy; // flip top-bottom
+			byte* pbBuf = (byte*)image.ImageData;
+			int cb1Pix = image.BytesPerPixel;
+			int cbImageStride = image.Stride;
 			int ibStart = yStart * cbImageStride + xStart * cb1Pix;
 			int cbRow = notedef.dx * cb1Pix;
 			int nTotal = 0;

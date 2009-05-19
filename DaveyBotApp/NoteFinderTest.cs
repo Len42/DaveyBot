@@ -43,25 +43,13 @@ namespace DaveyBot
 
 		override public int NumFramesDelay { get { return 8; } }
 
-		override public void AnalyzeImage(IntPtr buf, int cbBuf,
-										  int dyImage, int cbImageStride, int cb1Pix,
-										  AnalyzeState state)
+		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
 		{
-			DetectNote(state.Green, m_notedefGreen,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Red, m_notedefRed,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Yellow, m_notedefYellow,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Blue, m_notedefBlue,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Orange, m_notedefOrange,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
+			DetectNote(state.Green, m_notedefGreen, image);
+			DetectNote(state.Red, m_notedefRed, image);
+			DetectNote(state.Yellow, m_notedefYellow, image);
+			DetectNote(state.Blue, m_notedefBlue, image);
+			DetectNote(state.Orange, m_notedefOrange, image);
 		}
 
 		/// <summary>
@@ -75,19 +63,14 @@ namespace DaveyBot
 		/// <param name="note">State of the particular note (green, red, etc.)
 		/// which will be updated if that note is detected</param>
 		/// <param name="notedef">Description of the note being sought</param>
-		/// <param name="buf">Bitmap video image, as a raw byte buffer</param>
-		/// <param name="cbBuf">Size of image buffer</param>
-		/// <param name="dyImage">Bitmap height in pixels</param>
-		/// <param name="cbImageStride">Bitmap raster stride length</param>
-		/// <param name="cb1Pix">Number of bytes per pixel (typically 3)</param>
+		/// <param name="image">Image bitmap</param>
 		private void DetectNote(NoteState note,
 								NoteDef1 notedef,
-								IntPtr buf, int cbBuf,
-								int dyImage, int cbImageStride, int cb1Pix)
+								VideoImage image)
 		{
-			DetectNoteInterlaced(note, notedef, buf, cbBuf, 0, dyImage, cbImageStride, cb1Pix);
+			DetectNoteInterlaced(note, notedef, image);
 			if (!note.Found)
-				DetectNoteInterlaced(note, notedef, buf, cbBuf, 1, dyImage, cbImageStride, cb1Pix);
+				DetectNoteInterlaced(note, notedef, image);
 		}
 
 		/// <summary>
@@ -102,29 +85,23 @@ namespace DaveyBot
 		/// <param name="note">State of the particular note (green, red, etc.)
 		/// which will be updated if that note is detected</param>
 		/// <param name="notedef">Description of the note being sought</param>
-		/// <param name="buf">Bitmap video image, as a raw byte buffer</param>
-		/// <param name="cbBuf">Size of image buffer</param>
-		/// <param name="iInterlace">Offset (number of vertical lines) where interlaced image starts.
-		/// Either 0 or 1.</param>
-		/// <param name="dyImage">Bitmap height in pixels</param>
-		/// <param name="cbImageStride">Bitmap raster stride length</param>
-		/// <param name="cb1Pix">Number of bytes per pixel (typically 3)</param>
+		/// <param name="image">Image bitmap</param>
 		private unsafe void DetectNoteInterlaced(NoteState note,
 												NoteDef1 notedef,
-												IntPtr buf, int cbBuf, int iInterlace,
-												int dyImage, int cbImageStride, int cb1Pix)
+												VideoImage image)
 		{
-
 			//note.RValue = 0;
 			//note.GValue = 0;
 			//note.BValue = 0;
 
 			// Scan a specified region of the bitmap.
 			int xStart = notedef.xLeft;
-			int yStart = 2 * notedef.yTop + iInterlace;
-			yStart = dyImage - yStart - notedef.dy; // flip top-bottom
-			byte* pbBuf = (byte*)buf;
-			int ibStart = yStart * cbImageStride + xStart * cb1Pix;
+			int yStart = notedef.yTop;
+			yStart = image.Height - yStart - notedef.dy; // flip top-bottom
+			byte* pbBuf = (byte*)image.ImageData;
+			int cb1Pix = image.BytesPerPixel;
+			int cbImageStride = image.Stride;
+			int ibStart = image.Start + yStart * cbImageStride + xStart * cb1Pix;
 			int cbRow = notedef.dx * cb1Pix;
 			//int rTotal = 0, gTotal = 0, bTotal = 0;
 			for (int yCur = yStart; yCur < yStart + notedef.dy; yCur++)
@@ -144,10 +121,10 @@ namespace DaveyBot
 						//break;
 					}
 				}
-				ibStart += 2 * cbImageStride;
+				ibStart += cbImageStride;
 			}
 
-			// NOTE: Cannot distinuish between strummed notes and hammer-ons.
+			// NOTE: Cannot distinguish between strummed notes and hammer-ons.
 // DEBUG
 			//note.Strum = note.Found;
 

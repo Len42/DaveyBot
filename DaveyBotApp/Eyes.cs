@@ -76,8 +76,8 @@ namespace DaveyBot
 		private int m_cbVideoStride = 0;
 
 		/// <summary>Time interval between video frames, in seconds</summary>
-		public double VideoFrameInterval { get { return m_dtVideoFrameSecs; } }
-		private double m_dtVideoFrameSecs = 0;
+		public TimeSpan VideoFrameInterval { get { return m_dtFrameInterval; } }
+		private TimeSpan m_dtFrameInterval;
 
 		/// <summary>Is live video currently running?</summary>
 		public bool IsVideoPlaying { get { return m_fPlaying; } }
@@ -86,8 +86,8 @@ namespace DaveyBot
 		/// <summary>
 		/// Event containing a video frame that has been captured
 		/// </summary>
-		public event EventHandler<VideoFrameArgs> VideoFrame;
-		private void OnVideoFrame(VideoFrameArgs args)
+		public event EventHandler<VideoImage> VideoFrame;
+		private void OnVideoFrame(VideoImage args)
 		{
 			if (VideoFrame != null)
 				VideoFrame(this, args);
@@ -370,7 +370,9 @@ namespace DaveyBot
                 m_dyVideo = videoInfoHeader.BmiHeader.Height;
                 m_cb1Pix = videoInfoHeader.BmiHeader.BitCount / 8;
                 m_cbVideoStride = m_dxVideo * m_cb1Pix;
-				Check(basicVideo2.get_AvgTimePerFrame(out m_dtVideoFrameSecs));
+				double dtFrameIntervalSecs;
+				Check(basicVideo2.get_AvgTimePerFrame(out dtFrameIntervalSecs));
+				m_dtFrameInterval = new TimeSpan((long)(dtFrameIntervalSecs * 10000000));
 
                 // Also, we can now get the crossbar, which will be needed to select the video input.
                 int hr = captureGraphBuilder.FindInterface(null, null, bfVideoSource, typeof(IAMCrossbar).GUID, out o);
@@ -564,16 +566,17 @@ namespace DaveyBot
 		/// Process each video frame that is captured.
 		/// See <see cref="ISampleGrabberCB"/>.
 		/// </summary>
-		/// <param name="tSample">Timestamp of the video frame.
+		/// <param name="t">Timestamp of the video frame.
 		/// NOTE: This value appears to be garbage.</param>
 		/// <param name="buf">Bitmap video image, as a raw byte buffer</param>
 		/// <param name="cbBuf">Size of image buffer</param>
 		/// <returns>S_OK</returns>
-        public int BufferCB(double tSample, IntPtr buf, int cbBuf)
+        public int BufferCB(double t, IntPtr buf, int cbBuf)
         {
 			// Raise an event for others to process the frame.
-			VideoFrameArgs args = new VideoFrameArgs(tSample, buf, cbBuf);
-			OnVideoFrame(args);
+			// NOTE: Don't use the given timestamp. It's fubar.
+			VideoImage frame = new VideoImage(DateTime.Now, VideoWidth, VideoHeight, PixelDepth, VideoStride, 0, buf, cbBuf);
+			OnVideoFrame(frame);
 			return 0;
         }
     }

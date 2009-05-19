@@ -137,7 +137,7 @@
     </Compile>
     <Compile Include="PlayNotesArgs.cs" />
     <Compile Include="Eyes.cs" />
-    <Compile Include="VideoFrame.cs" />
+    <Compile Include="VideoImage.cs" />
     <Compile Include="VideoFrameGrab.cs" />
     <Compile Include="VideoFrameArgs.cs" />
   </ItemGroup>

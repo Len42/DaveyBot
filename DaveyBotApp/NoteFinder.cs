@@ -38,15 +38,9 @@ namespace DaveyBot
 		/// <para>Subclasses typically implement a DetectNote method and call it for each
 		/// possible note (green, red, etc.).</para>
 		/// </remarks>
-		/// <param name="buf">Bitmap video image, as a raw byte buffer</param>
-		/// <param name="cbBuf">Size of image buffer</param>
-		/// <param name="dyImage">Bitmap height in pixels</param>
-		/// <param name="cbImageStride">Bitmap raster stride length</param>
-		/// <param name="cb1Pix">Number of bytes per pixel (typically 3)</param>
+		/// <param name="image">Video image bitmap</param>
 		/// <param name="state">Current analysis state</param>
-		abstract public void AnalyzeImage(IntPtr buf, int cbBuf,
-										  int dyImage, int cbImageStride, int cb1Pix,
-										  AnalyzeState state);
+		abstract public void AnalyzeImage(VideoImage image, AnalyzeState state);
 
 		/// <summary>
 		/// The delay (as a number of video frames) between when a note is detected
@@ -57,12 +51,9 @@ namespace DaveyBot
 		/// </remarks>
 		abstract public int NumFramesDelay { get; }
 
-		protected void DelegateTest(NoteFinder nfOther,
-									IntPtr buf, int cbBuf,
-									int dyImage, int cbImageStride, int cb1Pix,
-									AnalyzeState state)
+		protected void DelegateTest(NoteFinder nfOther, VideoImage image, AnalyzeState state)
 		{
-			nfOther.AnalyzeImage(buf, cbBuf, dyImage, cbImageStride, cb1Pix, state);
+			nfOther.AnalyzeImage(image, state);
 		}
 	}
 }

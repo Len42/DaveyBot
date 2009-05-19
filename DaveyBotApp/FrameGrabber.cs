@@ -128,7 +128,7 @@ namespace DaveyBot
 		/// </remarks>
 		/// <param name="sender"></param>
 		/// <param name="args"></param>
-		public void eyes_VideoFrame(object sender, VideoFrameArgs args)
+		public void eyes_VideoFrame(object sender, VideoImage args)
 		{
 			if (m_fIsCapturing)
 			{
@@ -138,10 +138,7 @@ namespace DaveyBot
 				}
 				else
 				{
-					VideoFrameGrab frame = new VideoFrameGrab(args.FrameSampleTime,
-											  m_eyes.VideoWidth, m_eyes.VideoHeight,
-											  m_eyes.PixelDepth, m_eyes.VideoStride,
-											  args.FrameBuf, args.FrameBufSize);
+					VideoFrameGrab frame = new VideoFrameGrab(args);
 					lock (oLockFrames)
 						m_rgframe[m_cframe++] = frame;
 				}

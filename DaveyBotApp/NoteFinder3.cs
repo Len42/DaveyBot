@@ -54,25 +54,13 @@ namespace DaveyBot
 
 		override public int NumFramesDelay { get { return 10; } }
 
-		override public void AnalyzeImage(IntPtr buf, int cbBuf,
-										int dyImage, int cbImageStride, int cb1Pix,
-										AnalyzeState state)
+		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
 		{
-			DetectNote(state.Green, m_notedefGreenStrum, m_notedefGreenHopo,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Red, m_notedefRedStrum, m_notedefRedHopo,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Yellow, m_notedefYellowStrum, m_notedefYellowHopo,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Blue, m_notedefBlueStrum, m_notedefBlueHopo,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
-			DetectNote(state.Orange, m_notedefOrangeStrum, m_notedefOrangeHopo,
-						buf, cbBuf,
-						dyImage, cbImageStride, cb1Pix);
+			DetectNote(state.Green, m_notedefGreenStrum, m_notedefGreenHopo, image);
+			DetectNote(state.Red, m_notedefRedStrum, m_notedefRedHopo, image);
+			DetectNote(state.Yellow, m_notedefYellowStrum, m_notedefYellowHopo, image);
+			DetectNote(state.Blue, m_notedefBlueStrum, m_notedefBlueHopo, image);
+			DetectNote(state.Orange, m_notedefOrangeStrum, m_notedefOrangeHopo, image);
 
 /* // TODO: This doesn't work. Try something else.
 			// Try to ignore the flash of yellow lines when an energy phrase is conpleted.
@@ -100,19 +88,14 @@ namespace DaveyBot
 		/// which will be updated if that note is detected</param>
 		/// <param name="notedefStrummed">Description of the note being sought</param>
 		/// <param name="notedefHopo">Description of the hammer-on version of the note</param>
-		/// <param name="buf">Bitmap video image, as a raw byte buffer</param>
-		/// <param name="cbBuf">Size of image buffer</param>
-		/// <param name="dyImage">Bitmap height in pixels</param>
-		/// <param name="cbImageStride">Bitmap raster stride length</param>
-		/// <param name="cb1Pix">Number of bytes per pixel (typically 3)</param>
+		/// <param name="image">Image bitmap</param>
 		private void DetectNote(NoteState note,
 								NoteDef2 notedefStrummed, NoteDef2 notedefHopo,
-								IntPtr buf, int cbBuf,
-								int dyImage, int cbImageStride, int cb1Pix)
+								VideoImage image)
 		{
 			note.Strum = false;
 			// Look for a regular strummed note.
-			DetectNoteInterlaced(note, notedefStrummed, buf, cbBuf, dyImage, cbImageStride, cb1Pix);
+			DetectNoteInterlaced(note, notedefStrummed, image);
 			if (note.Found)
 			{
 				note.Strum = true; // found a strummed note
@@ -120,7 +103,7 @@ namespace DaveyBot
 			else
 			{
 				// Look for a not-strummed note.
-				DetectNoteInterlaced(note, notedefHopo, buf, cbBuf, dyImage, cbImageStride, cb1Pix);
+				DetectNoteInterlaced(note, notedefHopo, image);
 			}
 		}
 
@@ -134,19 +117,17 @@ namespace DaveyBot
 		/// <param name="note">State of the particular note (green, red, etc.)
 		/// which will be updated if that note is detected</param>
 		/// <param name="notedef">Description of the note being sought</param>
-		/// <param name="buf">Bitmap video image, as a raw byte buffer</param>
-		/// <param name="cbBuf">Size of image buffer</param>
-		/// <param name="dyImage">Bitmap height in pixels</param>
-		/// <param name="cbImageStride">Bitmap raster stride length</param>
-		/// <param name="cb1Pix">Number of bytes per pixel (typically 3)</param>
+		/// <param name="image">Image bitmap</param>
 		private void DetectNoteInterlaced(NoteState note,
 										NoteDef2 notedef,
-										IntPtr buf, int cbBuf,
-										int dyImage, int cbImageStride, int cb1Pix)
+										VideoImage image)
 		{
-			DetectNoteHelper(note, notedef, buf, cbBuf, 0, dyImage, cbImageStride, cb1Pix);
+			VideoImage imageSub0;
+			VideoImage imageSub1;
+			image.Deinterlace(new TimeSpan(0), out imageSub0, out imageSub1);
+			DetectNoteInterlaced(note, notedef, imageSub0);
 			if (!note.Found)
-				DetectNoteHelper(note, notedef, buf, cbBuf, 1, dyImage, cbImageStride, cb1Pix);
+				DetectNoteInterlaced(note, notedef, imageSub1);
 		}
 
 		/// <summary>
@@ -161,27 +142,22 @@ namespace DaveyBot
 		/// <param name="note">State of the particular note (green, red, etc.)
 		/// which will be updated if that note is detected</param>
 		/// <param name="notedef">Description of the note being sought</param>
-		/// <param name="buf">Bitmap video image, as a raw byte buffer</param>
-		/// <param name="cbBuf">Size of image buffer</param>
-		/// <param name="iInterlace">Offset (number of vertical lines) where interlaced image starts.
-		/// Either 0 or 1.</param>
-		/// <param name="dyImage">Bitmap height in pixels</param>
-		/// <param name="cbImageStride">Bitmap raster stride length</param>
-		/// <param name="cb1Pix">Number of bytes per pixel (typically 3)</param>
+		/// <param name="image">Image bitmap</param>
 		private unsafe void DetectNoteHelper(NoteState note,
 											NoteDef2 notedef,
-											IntPtr buf, int cbBuf, int iInterlace,
-											int dyImage, int cbImageStride, int cb1Pix)
+											VideoImage image)
 		{
 			note.RValue = 0;
 			//note.gValue unused
 			//note.bValue unused
 
 			int xStart = notedef.xLeft;
-			int yStart = 2 * notedef.yTop + iInterlace;
-			yStart = dyImage - yStart - notedef.dy; // flip top-bottom
-			byte* pbBuf = (byte*)buf;
-			int ibStart = yStart * cbImageStride + xStart * cb1Pix;
+			int yStart = notedef.yTop;
+			yStart = image.Height - yStart - notedef.dy; // flip top-bottom
+			byte* pbBuf = (byte*)image.ImageData;
+			int cb1Pix = image.BytesPerPixel;
+			int cbImageStride = image.Stride;
+			int ibStart = image.Start + yStart * cbImageStride + xStart * cb1Pix;
 			int cbRow = notedef.dx * cb1Pix;
 			int nTotal = 0;
 			for (int yCur = yStart; yCur < yStart + notedef.dy; yCur++)
@@ -193,7 +169,7 @@ namespace DaveyBot
 					// DEBUG: Mark checked pixels
 					//pbBuf[ib] = 255;
 				}
-				ibStart += 2 * cbImageStride;
+				ibStart += cbImageStride;
 			}
 
 			// Were enough "on" pixels found?

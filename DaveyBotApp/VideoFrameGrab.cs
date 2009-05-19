@@ -28,12 +28,18 @@ namespace DaveyBot
 	/// Stores a video image bitmap for the <see cref="FrameGrabber"/>.
 	/// </summary>
 	/// <remarks>
-	/// Unlike <see cref="VideoFrame"/>, this class copies the bitmap data into
+	/// Unlike <see cref="VideoImage"/>, this class copies the bitmap data into
 	/// its own byte[].
 	/// </remarks>
 	public struct VideoFrameGrab
 	{
-		public VideoFrameGrab(double tSample, int dx, int dy, int cb1Pix, int cbStride, IntPtr buf, int cbBuf)
+		public VideoFrameGrab(VideoImage image)
+			: this(image.SampleTime, image.Width, image.Height,
+					image.BytesPerPixel, image.Stride, image.ImageData, image.NumBytes)
+		{
+		}
+
+		public VideoFrameGrab(DateTime tSample, int dx, int dy, int cb1Pix, int cbStride, IntPtr buf, int cbBuf)
 		{
 			m_tSample = tSample;
 			m_dx = dx;
@@ -46,8 +52,8 @@ namespace DaveyBot
 		}
 
 		/// <summary>Timestamp of the video image</summary>
-		public double SampleTime { get { return m_tSample; } }
-		private double m_tSample;
+		public DateTime SampleTime { get { return m_tSample; } }
+		private DateTime m_tSample;
 
 		/// <summary>Width of the image in pixels</summary>
 		public int Width { get { return m_dx; } }
