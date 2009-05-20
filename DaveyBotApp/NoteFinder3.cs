@@ -125,9 +125,9 @@ namespace DaveyBot
 			VideoImage imageSub0;
 			VideoImage imageSub1;
 			image.Deinterlace(new TimeSpan(0), out imageSub0, out imageSub1);
-			DetectNoteInterlaced(note, notedef, imageSub0);
+			DetectNoteHelper(note, notedef, imageSub0);
 			if (!note.Found)
-				DetectNoteInterlaced(note, notedef, imageSub1);
+				DetectNoteHelper(note, notedef, imageSub1);
 		}
 
 		/// <summary>

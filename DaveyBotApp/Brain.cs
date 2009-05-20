@@ -288,7 +288,7 @@ namespace DaveyBot
 			{
 				// Error - invalid rectangle coords
 			}
-			else if (frame.NumBytes != 3)
+			else if (frame.BytesPerPixel != 3)
 			{
 				// Error - we can't handle this video format
 			}
