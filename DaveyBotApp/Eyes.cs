@@ -131,7 +131,7 @@ namespace DaveyBot
 			if (o != null)
 			{
 				int cRef = Marshal.ReleaseComObject(o);
-				Debug.Assert(cRef == 0, "COM object not fully released " + cRef);
+				Debug.Assert(cRef == 0, "COM object not fully released. Count: " + cRef);
 			}
 		}
 
