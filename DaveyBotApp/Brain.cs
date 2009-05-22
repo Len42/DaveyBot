@@ -127,7 +127,7 @@ namespace DaveyBot
 				// NOTE: NoteLagAdjust is subtracted, not added, so it will appear as a
 				// positive number in the Settings dialog.
 				m_dtNoteDelay = new TimeSpan(m_eyes.VideoFrameInterval.Ticks * m_noteFinder.NumFramesDelay
-											- Properties.Settings.Default.NoteLagAdjust * 10000);
+									- Properties.Settings.Default.NoteLagAdjust * TimeSpan.TicksPerMillisecond);
 				m_fDelayStrum = Properties.Settings.Default.DelayStrum;
 				m_fStrumPending = false;
 				m_state = new AnalyzeState();
@@ -350,11 +350,11 @@ namespace DaveyBot
 			stFile = Path.Combine(stDir, stFile);
 			StreamWriter fileResults = new StreamWriter(stFile);
 			fileResults.Write("Num,Strum,");
-			fileResults.Write("GreenFound,GreenPrevFound,GreenRThresh,GreenGThresh,GreenBThresh,GreenRValue,GreenGValue,GreenBValue,");
-			fileResults.Write("RedFound,RedPrevFound,RedRThresh,RedGThresh,RedBThresh,RedRValue,RedGValue,RedBValue,");
-			fileResults.Write("YellowFound,YellowPrevFound,YellowRThresh,YellowGThresh,YellowBThresh,YellowRValue,YellowGValue,YellowBValue,");
-			fileResults.Write("BlueFound,BluePrevFound,BlueRThresh,BlueGThresh,BlueBThresh,BlueRValue,BlueGValue,BlueBValue,");
-			fileResults.Write("OrangeFound,OrangePrevFound,OrangeRThresh,OrangeGThresh,OrangeBThresh,OrangeRValue,OrangeGValue,OrangeBValue");
+			fileResults.Write("GreenFound,GreenPrevFound,GreenRValue,GreenGValue,GreenBValue,");
+			fileResults.Write("RedFound,RedPrevFound,RedRValue,RedGValue,RedBValue,");
+			fileResults.Write("YellowFound,YellowPrevFound,YellowRValue,YellowGValue,YellowBValue,");
+			fileResults.Write("BlueFound,BluePrevFound,BlueRValue,BlueGValue,BlueBValue,");
+			fileResults.Write("OrangeFound,OrangePrevFound,OrangeRValue,OrangeGValue,OrangeBValue");
 			fileResults.WriteLine();
 			for (int i = 0; ; i++)
 			{

@@ -372,7 +372,7 @@ namespace DaveyBot
                 m_cbVideoStride = m_dxVideo * m_cb1Pix;
 				double dtFrameIntervalSecs;
 				Check(basicVideo2.get_AvgTimePerFrame(out dtFrameIntervalSecs));
-				m_dtFrameInterval = new TimeSpan((long)(dtFrameIntervalSecs * 10000000));
+				m_dtFrameInterval = new TimeSpan((long)(dtFrameIntervalSecs * TimeSpan.TicksPerSecond));
 
                 // Also, we can now get the crossbar, which will be needed to select the video input.
                 int hr = captureGraphBuilder.FindInterface(null, null, bfVideoSource, typeof(IAMCrossbar).GUID, out o);

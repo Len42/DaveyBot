@@ -71,10 +71,10 @@ namespace DaveyBot
 		/// <returns>String of comma-separated values describing the object's properties</returns>
 		public string AsCSVString()
 		{
-			return String.Format("{0},{1},{2},{3},{4},{5},{6},{7}",
+			return String.Format("{0},{1},{2},{3},{4}",
 								fFound ? "True" : "",
 								fPrevFound ? "True" : "",
-								rMin, gMin, bMin,
+								//rMin, gMin, bMin,
 								rValue, gValue, bValue);
 		}
 	}

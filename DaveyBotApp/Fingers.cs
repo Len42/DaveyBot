@@ -188,11 +188,11 @@ namespace DaveyBot
 		private bool m_fAbort = false;
 
 		/// <summary>Milliseconds to sleep when polling the event queue</summary>
-		private static TimeSpan dtSleep = new TimeSpan(10 * 10000);
+		private static TimeSpan dtSleep = new TimeSpan(10 * TimeSpan.TicksPerMillisecond);
 		/// <summary>Handle events that are slightly in the future</summary>
 		private static TimeSpan dtAhead = new TimeSpan(dtSleep.Ticks / 4);
 		/// <summary>Ignore events that are old and stale</summary>
-		private static TimeSpan dtOld = new TimeSpan(200 * 10000);
+		private static TimeSpan dtOld = new TimeSpan(200 * TimeSpan.TicksPerMillisecond);
 
 		/// <summary>Lock variable for Start and Stop methods</summary>
 		private object oLockStartStop = new Object();

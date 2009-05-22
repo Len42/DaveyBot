@@ -25,7 +25,7 @@ using System.Runtime.InteropServices;
 namespace DaveyBot
 {
 	/// <summary>
-	/// A video image bitmap that was captured by <see cref="Eyes"/>.
+	/// An interlaced video image bitmap that was captured by <see cref="Eyes"/>.
 	/// </summary>
 	/// <remarks>
 	/// <para>The bitmap data buffer is represented by an IntPtr which is NOT freed
