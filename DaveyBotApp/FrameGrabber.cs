@@ -138,25 +138,10 @@ namespace DaveyBot
 				}
 				else
 				{
-					// NOTE: We are de-interlacing the frame and writing two
-					// separate images for each video frame.
-					// Should that be an optional feature?
-					VideoImage imageSub0;
-					VideoImage imageSub1;
-					args.Deinterlace(Eyes.VideoFrameInterval, out imageSub0, out imageSub1);
-					GrabOneFrame(imageSub0);
-					GrabOneFrame(imageSub1);
+					VideoFrameGrab frame = new VideoFrameGrab(args);
+					lock (oLockFrames)
+						m_rgframe[m_cframe++] = frame;
 				}
-			}
-		}
-
-		private void GrabOneFrame(VideoImage image)
-		{
-			VideoFrameGrab frame = new VideoFrameGrab(image);
-			lock (oLockFrames)
-			{
-				if (m_cframe < m_cframeAlloc)
-					m_rgframe[m_cframe++] = frame;
 			}
 		}
 
@@ -218,7 +203,7 @@ namespace DaveyBot
 					// Write info about the video frame.
 					fileInfo.Write(i);
 					fileInfo.Write(',');
-					fileInfo.Write(frame.SampleTime.ToLongTimeString());
+					fileInfo.Write(frame.SampleTime);
 					fileInfo.Write(',');
 					fileInfo.WriteLine(stFile);
 				}
