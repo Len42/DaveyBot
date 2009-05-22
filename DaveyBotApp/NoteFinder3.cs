@@ -30,11 +30,10 @@ namespace DaveyBot
 	/// <para>This algorithm looks for the small white areas on each end of the notes.
 	/// Regular strummed notes are wider than hammer-on/pull-off notes, so there are two
 	/// sets of note definitions.</para>
-	/// <para>It treats the image as two interlaced images, examining each separately.</para>
 	/// <para>This algorithm is quite accurate at recognizing notes, but not perfect.
 	/// In particular, it is confused by the flash of yellow lines at the end of an energy phrase.</para>
 	/// </remarks>
-	/// <seealso cref="NoteDef1"/>
+	/// <seealso cref="NoteDef2"/>
 	class NoteFinder3 : NoteFinder
 	{
 		// Note definitions
@@ -52,7 +51,7 @@ namespace DaveyBot
 		private NoteDef2 m_notedefOrangeStrum = new NoteDef2(440/*443*/, 146, dxNote, dyNote, nNoteBrightness);
 		private NoteDef2 m_notedefOrangeHopo = new NoteDef2(447, 146, dxNote, dyNote, nNoteBrightness);
 
-		override public int NumFramesDelay { get { return 10; } }
+		override public int NumFramesDelay { get { return 20; } }
 
 		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
 		{
@@ -95,7 +94,7 @@ namespace DaveyBot
 		{
 			note.Strum = false;
 			// Look for a regular strummed note.
-			DetectNoteInterlaced(note, notedefStrummed, image);
+			DetectNoteHelper(note, notedefStrummed, image);
 			if (note.Found)
 			{
 				note.Strum = true; // found a strummed note
@@ -103,31 +102,8 @@ namespace DaveyBot
 			else
 			{
 				// Look for a not-strummed note.
-				DetectNoteInterlaced(note, notedefHopo, image);
+				DetectNoteHelper(note, notedefHopo, image);
 			}
-		}
-
-		/// <summary>
-		/// Look for a particular type of note in an image.
-		/// </summary>
-		/// <remarks>
-		/// This method treats the image as two interlaced images and analyzes them separately.
-		/// That makes the note shapes appear more coherent.
-		/// </remarks>
-		/// <param name="note">State of the particular note (green, red, etc.)
-		/// which will be updated if that note is detected</param>
-		/// <param name="notedef">Description of the note being sought</param>
-		/// <param name="image">Image bitmap</param>
-		private void DetectNoteInterlaced(NoteState note,
-										NoteDef2 notedef,
-										VideoImage image)
-		{
-			VideoImage imageSub0;
-			VideoImage imageSub1;
-			image.Deinterlace(new TimeSpan(0), out imageSub0, out imageSub1);
-			DetectNoteHelper(note, notedef, imageSub0);
-			if (!note.Found)
-				DetectNoteHelper(note, notedef, imageSub1);
 		}
 
 		/// <summary>
@@ -136,7 +112,6 @@ namespace DaveyBot
 		/// <remarks>
 		/// <para>This method checks a small rectangle at the end of the note area.
 		/// If there are enough "on" pixels then there is something there!</para>
-		/// <para>This method examines one interlaced sub-image.</para>
 		/// </remarks>
 		/// <seealso cref="DetectNote"/>
 		/// <param name="note">State of the particular note (green, red, etc.)

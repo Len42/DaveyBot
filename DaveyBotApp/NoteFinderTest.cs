@@ -27,77 +27,105 @@ namespace DaveyBot
 	/// A TEST note-detection algorithm for Rock Band.
 	/// </summary>
 	/// <remarks>
-	/// <para>For TESTING only - does not flag found notes</para>
-	/// <para>This algorithm looks for bright pixels.</para>
-	/// <para>It treats the image as two interlaced images, examining each separately.</para>
+	/// <para>This algorithm looks for the small white areas on each end of the notes.
+	/// Regular strummed notes are wider than hammer-on/pull-off notes, so there are two
+	/// sets of note definitions.</para>
+	/// <para>This algorithm is quite accurate at recognizing notes, but not perfect.
+	/// In particular, it is confused by the flash of yellow lines at the end of an energy phrase.</para>
 	/// </remarks>
 	/// <seealso cref="NoteDef1"/>
 	class NoteFinderTest : NoteFinder
 	{
 		// Note definitions
-		private NoteDef1 m_notedefGreen = new NoteDef1(250, 160, 7, 4, 0, 200, 0);
-		private NoteDef1 m_notedefRed = new NoteDef1(302, 159, 7, 4, 200, 0, 0);
-		private NoteDef1 m_notedefYellow = new NoteDef1(357, 158, 7, 4, 200, 170, 0);
-		private NoteDef1 m_notedefBlue = new NoteDef1(412, 159, 7, 4, 0, 0, 200);
-		private NoteDef1 m_notedefOrange = new NoteDef1(464, 160, 7, 4, 200, 170, 0);
+		private const int dxNote = 2;
+		private const int dyNote = 4; //3;
+		private const int nNoteBrightness = 120;
+		private NoteDef2 m_notedefGreenStrum = new NoteDef2(277, 146, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefGreenHopo = new NoteDef2(271, 146, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefRedStrum = new NoteDef2(327, 145, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefRedHopo = new NoteDef2(320, 145, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefYellowStrum = new NoteDef2(341, 145, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefYellowHopo = new NoteDef2(348, 145, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefBlueStrum = new NoteDef2(392, 145, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefBlueHopo = new NoteDef2(399, 145, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefOrangeStrum = new NoteDef2(440/*443*/, 146, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefOrangeHopo = new NoteDef2(447, 146, dxNote, dyNote, nNoteBrightness);
 
-		override public int NumFramesDelay { get { return 8; } }
+		override public int NumFramesDelay { get { return 16; } }
 
 		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
 		{
-			DetectNote(state.Green, m_notedefGreen, image);
-			DetectNote(state.Red, m_notedefRed, image);
-			DetectNote(state.Yellow, m_notedefYellow, image);
-			DetectNote(state.Blue, m_notedefBlue, image);
-			DetectNote(state.Orange, m_notedefOrange, image);
+			DetectNote(state.Green, m_notedefGreenStrum, m_notedefGreenHopo, image);
+			DetectNote(state.Red, m_notedefRedStrum, m_notedefRedHopo, image);
+			DetectNote(state.Yellow, m_notedefYellowStrum, m_notedefYellowHopo, image);
+			DetectNote(state.Blue, m_notedefBlueStrum, m_notedefBlueHopo, image);
+			DetectNote(state.Orange, m_notedefOrangeStrum, m_notedefOrangeHopo, image);
+
+			/* // TODO: This doesn't work. Try something else.
+						// Try to ignore the flash of yellow lines when an energy phrase is conpleted.
+						// This may cause us to miss a real note occasionally. Oh well.
+						if (state.Green.Found && state.Red.Found && state.Yellow.Found
+							&& state.Blue.Found && state.Orange.Found)
+						{
+							state.Green.Found = false;
+							state.Red.Found = false;
+							state.Yellow.Found = false;
+							state.Blue.Found = false;
+							state.Orange.Found = false;
+						}
+			*/
 		}
 
 		/// <summary>
 		/// Look for a particular type of note in an image.
 		/// </summary>
 		/// <remarks>
-		/// <para>Look for a horizontal line or rectangle of (approximately) a particular colour.</para>
-		/// <para>This method treats the image as two interlaced images and analyzes them separately.
-		/// That makes the note shapes appear more coherent.</para>
+		/// Look for the bright "ends" of the notes.
+		/// Look for a regular (strummed) note first, and then for a hammer-on/pull-off note.
 		/// </remarks>
 		/// <param name="note">State of the particular note (green, red, etc.)
 		/// which will be updated if that note is detected</param>
-		/// <param name="notedef">Description of the note being sought</param>
+		/// <param name="notedefStrummed">Description of the note being sought</param>
+		/// <param name="notedefHopo">Description of the hammer-on version of the note</param>
 		/// <param name="image">Image bitmap</param>
 		private void DetectNote(NoteState note,
-								NoteDef1 notedef,
+								NoteDef2 notedefStrummed, NoteDef2 notedefHopo,
 								VideoImage image)
 		{
-			VideoImage imageSub0;
-			VideoImage imageSub1;
-			image.Deinterlace(new TimeSpan(0), out imageSub0, out imageSub1);
-			DetectNoteInterlaced(note, notedef, imageSub0);
-			if (!note.Found)
-				DetectNoteInterlaced(note, notedef, imageSub1);
+			note.Strum = false;
+			// Look for a regular strummed note.
+			DetectNoteHelper(note, notedefStrummed, image);
+			if (note.Found)
+			{
+				note.Strum = true; // found a strummed note
+			}
+			else
+			{
+				// Look for a not-strummed note.
+				DetectNoteHelper(note, notedefHopo, image);
+			}
 		}
 
 		/// <summary>
 		/// Check a given image region to see if a note is sitting there.
 		/// </summary>
 		/// <remarks>
-		/// <para>This method checks one more more horizontal lines. If there are
-		/// enough "on" pixels of the appropriate colour then there is something there!</para>
-		/// <para>This method examines one interlaced sub-image.</para>
+		/// <para>This method checks a small rectangle at the end of the note area.
+		/// If there are enough "on" pixels then there is something there!</para>
 		/// </remarks>
 		/// <seealso cref="DetectNote"/>
 		/// <param name="note">State of the particular note (green, red, etc.)
 		/// which will be updated if that note is detected</param>
 		/// <param name="notedef">Description of the note being sought</param>
 		/// <param name="image">Image bitmap</param>
-		private unsafe void DetectNoteInterlaced(NoteState note,
-												NoteDef1 notedef,
-												VideoImage image)
+		private unsafe void DetectNoteHelper(NoteState note,
+											NoteDef2 notedef,
+											VideoImage image)
 		{
-			//note.RValue = 0;
-			//note.GValue = 0;
-			//note.BValue = 0;
+			note.RValue = 0;
+			//note.gValue unused
+			//note.bValue unused
 
-			// Scan a specified region of the bitmap.
 			int xStart = notedef.xLeft;
 			int yStart = notedef.yTop;
 			yStart = image.Height - yStart - notedef.dy; // flip top-bottom
@@ -106,38 +134,29 @@ namespace DaveyBot
 			int cbImageStride = image.Stride;
 			int ibStart = image.Start + yStart * cbImageStride + xStart * cb1Pix;
 			int cbRow = notedef.dx * cb1Pix;
-			//int rTotal = 0, gTotal = 0, bTotal = 0;
+			int nTotal = 0;
 			for (int yCur = yStart; yCur < yStart + notedef.dy; yCur++)
 			{
 				int ibEnd = ibStart + cbRow;
-				for (int ib = ibStart; ib < ibEnd; ib += cb1Pix)
+				for (int ib = ibStart; ib < ibEnd; ib++)
 				{
-					if (pbBuf[ib] >= notedef.bMin
-						&& pbBuf[ib + 1] >= notedef.gMin
-						&& pbBuf[ib + 2] >= notedef.rMin)
-					{
-						// DEBUG: Mark found pixels
-						pbBuf[ib] = 255;
-						pbBuf[ib + 1] = 0;
-						pbBuf[ib + 2] = 255;
-						// DEBUG:
-						//break;
-					}
+					nTotal += pbBuf[ib];
+					// DEBUG: Mark checked pixels
+					//pbBuf[ib] = 255;
 				}
 				ibStart += cbImageStride;
 			}
 
-			// NOTE: Cannot distinguish between strummed notes and hammer-ons.
-// DEBUG
-			//note.Strum = note.Found;
+			// Were enough "on" pixels found?
+			note.Found = nTotal >= (notedef.nBrightnessMin * notedef.dx * notedef.dy * cb1Pix);
 
 			// DEBUG: Return various values used & calculated.
-			//note.RMin = notedef.rMin;
-			//note.GMin = notedef.gMin;
-			//note.BMin = notedef.bMin;
-			//note.RValue = rTotal / (notedef.dx * notedef.dy);
-			//note.GValue = gTotal / (notedef.dx * notedef.dy);
-			//note.BValue = bTotal / (notedef.dx * notedef.dy);
+			note.RMin = notedef.nBrightnessMin;
+			//note.gMin unused
+			//note.bMin unused
+			note.RValue = nTotal / (notedef.dx * notedef.dy * cb1Pix);
+			//note.gValue unused
+			//note.bValue unused
 		}
 	}
 }

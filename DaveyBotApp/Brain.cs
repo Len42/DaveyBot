@@ -34,6 +34,10 @@ namespace DaveyBot
 	/// </remarks>
 	public class Brain
 	{
+		// Colours for superimposed rectangles that indicate notes
+		private static Color clrYes = Color.FromArgb(0, 255, 0);
+		private static Color clrNo = Color.Black;
+
 		/// <summary>
 		/// The video capture object supplying the images to be analyzed
 		/// </summary>
@@ -152,29 +156,42 @@ namespace DaveyBot
 		{
 			if (m_fIsRunning)
 			{
-				Color clrFill;
-				Color clrYes = Color.FromArgb(0, 255, 0);
-				Color clrNo = Color.Black;
-
-				// Analyze the video frame to see if any notes have hit.
-				AnalyzeFrame(frame, m_state);
-
-				// DEBUG: Mark detected notes on the live video frame.
-				clrFill = m_state.Green.Found ? clrYes : clrNo;
-				FillRect(234 - 12, 24, 364 + 24, 10, clrFill, frame);
-				clrFill = m_state.Red.Found ? clrYes : clrNo;
-				FillRect(297 - 12, 24, 364 + 24, 10, clrFill, frame);
-				clrFill = m_state.Yellow.Found ? clrYes : clrNo;
-				FillRect(360 - 12, 24, 364 + 24, 10, clrFill, frame);
-				clrFill = m_state.Blue.Found ? clrYes : clrNo;
-				FillRect(423 - 12, 24, 364 + 24, 10, clrFill, frame);
-				clrFill = m_state.Orange.Found ? clrYes : clrNo;
-				FillRect(482 - 12, 24, 364 + 24, 10, clrFill, frame);
-
-				// Figure out which buttons to press based on the analysis.
-				ExecuteActions(frame.SampleTime);
-
+				VideoImage frameSub0;
+				VideoImage frameSub1;
+				frame.Deinterlace(Eyes.VideoFrameInterval, out frameSub0, out frameSub1);
+				HandleSubFrame(frameSub0);
+				HandleSubFrame(frameSub1);
 			}
+		}
+
+		/// <summary>
+		/// Process one de-interlaced sub-frame of video.
+		/// </summary>
+		/// <remarks>
+		/// This method will be called twice for each interlaced video frame
+		/// that is received from <see cref="DaveyBot.Eyes"/>.
+		/// </remarks>
+		/// <param name="frame">Video image bitmap</param>
+		private void HandleSubFrame(VideoImage frame)
+		{
+			// Analyze the video frame to see if any notes have hit.
+			AnalyzeFrame(frame, m_state);
+
+			// DEBUG: Mark detected notes on the live video frame.
+			Color clrFill;
+			clrFill = m_state.Green.Found ? clrYes : clrNo;
+			FillRect(234 - 12, 24, 364 + 24, 10, clrFill, frame);
+			clrFill = m_state.Red.Found ? clrYes : clrNo;
+			FillRect(297 - 12, 24, 364 + 24, 10, clrFill, frame);
+			clrFill = m_state.Yellow.Found ? clrYes : clrNo;
+			FillRect(360 - 12, 24, 364 + 24, 10, clrFill, frame);
+			clrFill = m_state.Blue.Found ? clrYes : clrNo;
+			FillRect(423 - 12, 24, 364 + 24, 10, clrFill, frame);
+			clrFill = m_state.Orange.Found ? clrYes : clrNo;
+			FillRect(482 - 12, 24, 364 + 24, 10, clrFill, frame);
+
+			// Figure out which buttons to press based on the analysis.
+			ExecuteActions(frame.SampleTime);
 		}
 
 		/// <summary>

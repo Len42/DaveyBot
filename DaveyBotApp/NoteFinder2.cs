@@ -38,20 +38,20 @@ namespace DaveyBot
 	{
 		// Note definitions
 		private const int dxNote = 3;
-		private const int dyNote = 7;
+		private const int dyNote = 3;
 		private const int nNoteBrightness = 120;
-		private NoteDef2 m_notedefGreenStrum = new NoteDef2(266, 335, dxNote, dyNote, nNoteBrightness);
-		private NoteDef2 m_notedefGreenHopo = new NoteDef2(257, 335, dxNote, dyNote, nNoteBrightness);
-		private NoteDef2 m_notedefRedStrum = new NoteDef2(282, 334, dxNote, dyNote, nNoteBrightness);
-		private NoteDef2 m_notedefRedHopo = new NoteDef2(291, 334, dxNote, dyNote, nNoteBrightness);
-		private NoteDef2 m_notedefYellowStrum = new NoteDef2(339, 332, dxNote, dyNote, nNoteBrightness);
-		private NoteDef2 m_notedefYellowHopo = new NoteDef2(348, 332, dxNote, dyNote, nNoteBrightness);
-		private NoteDef2 m_notedefBlueStrum = new NoteDef2(438, 334, dxNote, dyNote, nNoteBrightness);
-		private NoteDef2 m_notedefBlueHopo = new NoteDef2(405, 334, dxNote, dyNote, nNoteBrightness);
-		private NoteDef2 m_notedefOrangeStrum = new NoteDef2(452, 335, dxNote, dyNote, nNoteBrightness);
-		private NoteDef2 m_notedefOrangeHopo = new NoteDef2(461, 335, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefGreenStrum = new NoteDef2(266, 168, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefGreenHopo = new NoteDef2(257, 168, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefRedStrum = new NoteDef2(282, 167, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefRedHopo = new NoteDef2(291, 167, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefYellowStrum = new NoteDef2(339, 166, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefYellowHopo = new NoteDef2(348, 166, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefBlueStrum = new NoteDef2(438, 167, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefBlueHopo = new NoteDef2(405, 167, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefOrangeStrum = new NoteDef2(452, 168, dxNote, dyNote, nNoteBrightness);
+		private NoteDef2 m_notedefOrangeHopo = new NoteDef2(461, 168, dxNote, dyNote, nNoteBrightness);
 
-		override public int NumFramesDelay { get { return 5; } }
+		override public int NumFramesDelay { get { return 10; } }
 
 		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
 		{
@@ -136,7 +136,7 @@ namespace DaveyBot
 			byte* pbBuf = (byte*)image.ImageData;
 			int cb1Pix = image.BytesPerPixel;
 			int cbImageStride = image.Stride;
-			int ibStart = yStart * cbImageStride + xStart * cb1Pix;
+			int ibStart = image.Start + yStart * cbImageStride + xStart * cb1Pix;
 			int cbRow = notedef.dx * cb1Pix;
 			int nTotal = 0;
 			for (int yCur = yStart; yCur < yStart + notedef.dy; yCur++)

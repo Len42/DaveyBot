@@ -28,7 +28,6 @@ namespace DaveyBot
 	/// </summary>
 	/// <remarks>
 	/// <para>This algorithm looks for bright pixels.</para>
-	/// <para>It treats the image as two interlaced images, examining each separately.</para>
 	/// </remarks>
 	/// <seealso cref="NoteDef1"/>
 	class NoteFinder4 : NoteFinder
@@ -40,7 +39,7 @@ namespace DaveyBot
 		private NoteDef1 m_notedefBlue = new NoteDef1(412, 159, 7, 3, 0, 0, 200);
 		private NoteDef1 m_notedefOrange = new NoteDef1(464, 160, 7, 3, 200, 170, 0);
 
-		override public int NumFramesDelay { get { return 8; } }
+		override public int NumFramesDelay { get { return 16; } }
 
 		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
 		{
@@ -52,45 +51,20 @@ namespace DaveyBot
 		}
 
 		/// <summary>
-		/// Look for a particular type of note in an image.
-		/// </summary>
-		/// <remarks>
-		/// <para>Look for a horizontal line or rectangle of (approximately) a particular colour.</para>
-		/// <para>This method treats the image as two interlaced images and analyzes them separately.
-		/// That makes the note shapes appear more coherent.</para>
-		/// </remarks>
-		/// <param name="note">State of the particular note (green, red, etc.)
-		/// which will be updated if that note is detected</param>
-		/// <param name="notedef">Description of the note being sought</param>
-		/// <param name="image">Image bitmap</param>
-		private void DetectNote(NoteState note,
-								NoteDef1 notedef,
-								VideoImage image)
-		{
-			VideoImage imageSub0;
-			VideoImage imageSub1;
-			image.Deinterlace(new TimeSpan(0), out imageSub0, out imageSub1);
-			DetectNoteInterlaced(note, notedef, imageSub0);
-			if (!note.Found)
-				DetectNoteInterlaced(note, notedef, imageSub1);
-		}
-
-		/// <summary>
 		/// Check a given image region to see if a note is sitting there.
 		/// </summary>
 		/// <remarks>
 		/// <para>This method checks one more more horizontal lines. If there are
 		/// enough "on" pixels of the appropriate colour then there is something there!</para>
-		/// <para>This method examines one interlaced sub-image.</para>
 		/// </remarks>
 		/// <seealso cref="DetectNote"/>
 		/// <param name="note">State of the particular note (green, red, etc.)
 		/// which will be updated if that note is detected</param>
 		/// <param name="notedef">Description of the note being sought</param>
 		/// <param name="image">Image bitmap</param>
-		private unsafe void DetectNoteInterlaced(NoteState note,
-												NoteDef1 notedef,
-												VideoImage image)
+		private unsafe void DetectNote(NoteState note,
+										NoteDef1 notedef,
+										VideoImage image)
 		{
 			//note.RValue = 0;
 			//note.GValue = 0;
