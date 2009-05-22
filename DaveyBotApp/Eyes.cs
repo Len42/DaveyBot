@@ -75,7 +75,7 @@ namespace DaveyBot
 		public int VideoStride { get { return m_cbVideoStride; } }
 		private int m_cbVideoStride = 0;
 
-		/// <summary>Time interval between video frames, in seconds</summary>
+		/// <summary>Time interval between video frames</summary>
 		public TimeSpan VideoFrameInterval { get { return m_dtFrameInterval; } }
 		private TimeSpan m_dtFrameInterval;
 
