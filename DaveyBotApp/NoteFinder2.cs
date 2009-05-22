@@ -51,7 +51,7 @@ namespace DaveyBot
 		private NoteDef2 m_notedefOrangeStrum = new NoteDef2(452, 168, dxNote, dyNote, nNoteBrightness);
 		private NoteDef2 m_notedefOrangeHopo = new NoteDef2(461, 168, dxNote, dyNote, nNoteBrightness);
 
-		override public int NumFramesDelay { get { return 10; } }
+		override public int NumFramesDelay { get { return 8; } }
 
 		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
 		{

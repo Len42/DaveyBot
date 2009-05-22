@@ -39,7 +39,7 @@ namespace DaveyBot
 		private NoteDef1 m_notedefBlue = new NoteDef1(412, 159, 7, 3, 0, 0, 200);
 		private NoteDef1 m_notedefOrange = new NoteDef1(464, 160, 7, 3, 200, 170, 0);
 
-		override public int NumFramesDelay { get { return 16; } }
+		override public int NumFramesDelay { get { return 12; } }
 
 		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
 		{

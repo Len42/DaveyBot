@@ -51,6 +51,51 @@ namespace DaveyBot
 			Marshal.Copy(buf, m_pbPixels, 0, cbBuf);
 		}
 
+		/// <summary>
+		/// Create a VideoFrameGrab bitmap from a <see cref="VideoImage"/> bitmap,
+		/// which may represent half of an interlaced video frame.
+		/// </summary>
+		/// <todo></todo>
+		/// <param name="image"></param>
+		/// <returns></returns>
+		public static unsafe VideoFrameGrab CreateDeInterlaced(VideoImage image)
+		{
+			VideoFrameGrab frameGrab = new VideoFrameGrab();
+			frameGrab.m_tSample = image.SampleTime;
+			frameGrab.m_dx = image.Width;
+			frameGrab.m_dy = image.Height;
+			frameGrab.m_cb1Pix = image.BytesPerPixel;
+			int cbRow = frameGrab.m_dx * frameGrab.m_cb1Pix;
+			frameGrab.m_cbStride = cbRow; // de-interlacing
+			int cbPixels = frameGrab.m_dx * frameGrab.m_dy * frameGrab.m_cb1Pix;
+			frameGrab.m_pbPixels = new byte[cbPixels];
+
+			int ibDst;
+			int ibDstStart;
+			int ibDstEnd;
+			byte* pbSrc = (byte*)image.ImageData;
+			int ibSrc;
+			int ibSrcStart;
+			int ibSrcEnd;
+			ibSrcStart = image.Start;
+			ibDstStart = 0;
+			for (int i = 0; i < frameGrab.m_dy; i++)
+			{
+				ibSrcEnd = ibSrcStart + cbRow;
+				ibDstEnd = ibDstStart + cbRow;
+				ibSrc = ibSrcStart;
+				ibDst = ibDstStart;
+				while (ibDst < ibDstEnd)
+				{
+					frameGrab.m_pbPixels[ibDst++] = pbSrc[ibSrc++];
+				}
+				ibSrcStart += image.Stride;
+				ibDstStart += frameGrab.m_cbStride;
+			}
+	
+			return frameGrab;
+		}
+
 		/// <summary>Timestamp of the video image</summary>
 		public DateTime SampleTime { get { return m_tSample; } }
 		private DateTime m_tSample;

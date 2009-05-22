@@ -124,7 +124,9 @@ namespace DaveyBot
 		/// Event handler to grab video frames as they come in.
 		/// </summary>
 		/// <remarks>
-		/// The images are saved in an array and will be written to files later.
+		/// <para>The images are saved in an array and will be written to files later.</para>
+		/// <para>Each video frame is de-interlaced into two sub-frames which are
+		/// saved as separate images.</para>
 		/// </remarks>
 		/// <param name="sender"></param>
 		/// <param name="args"></param>
@@ -138,10 +140,22 @@ namespace DaveyBot
 				}
 				else
 				{
-					VideoFrameGrab frame = new VideoFrameGrab(args);
-					lock (oLockFrames)
-						m_rgframe[m_cframe++] = frame;
+					VideoImage imageSub0;
+					VideoImage imageSub1;
+					args.Deinterlace(Eyes.VideoFrameInterval, out imageSub0, out imageSub1);
+					GrabOneFrame(imageSub0);
+					GrabOneFrame(imageSub1);
 				}
+			}
+		}
+
+		private void GrabOneFrame(VideoImage image)
+		{
+			VideoFrameGrab frame = VideoFrameGrab.CreateDeInterlaced(image);
+			lock (oLockFrames)
+			{
+				if (m_cframe < m_cframeAlloc)
+					m_rgframe[m_cframe++] = frame;
 			}
 		}
 
@@ -181,10 +195,13 @@ namespace DaveyBot
 				// Create a summary text file.
 				string stPath = Path.Combine(stDir, "frames.txt");
 				StreamWriter fileInfo = File.CreateText(stPath);
+				DateTime tStart = new DateTime();
 				// Write out all captured images to separate files.
 				for (int i = 0; i < cframe; i++)
 				{
 					VideoFrameGrab frame = rgframe[i];
+					if (i == 0)
+						tStart = frame.SampleTime;
 					// Convert the raw pixels to a proper bitmap.
 					// TODO: PixelFormat - for now, it's assumed
 					IntPtr hPixels = Marshal.AllocHGlobal(frame.NumBytes);
@@ -203,7 +220,8 @@ namespace DaveyBot
 					// Write info about the video frame.
 					fileInfo.Write(i);
 					fileInfo.Write(',');
-					fileInfo.Write(frame.SampleTime);
+					TimeSpan dt = frame.SampleTime - tStart;
+					fileInfo.Write(dt.TotalSeconds);
 					fileInfo.Write(',');
 					fileInfo.WriteLine(stFile);
 				}

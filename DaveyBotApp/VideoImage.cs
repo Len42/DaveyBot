@@ -99,8 +99,11 @@ namespace DaveyBot
 		/// <param name="imageOut1"></param>
 		public void Deinterlace(TimeSpan dtFrameInterval, out VideoImage imageOut0, out VideoImage imageOut1)
 		{
-			imageOut1 = new VideoImage(SampleTime + dtFrameInterval, Width, Height / 2, BytesPerPixel, 2 * Stride, Stride, ImageData, NumBytes);
-			imageOut0 = new VideoImage(SampleTime, Width, Height - imageOut1.Height, BytesPerPixel, 2 * Stride, 0, ImageData, NumBytes);
+			TimeSpan dtSubInterval = new TimeSpan(dtFrameInterval.Ticks / 2);
+			// NOTE: The first image starts on the second scan line, and
+			// the second image starts on the first scan line!
+			imageOut0 = new VideoImage(SampleTime, Width, Height / 2, BytesPerPixel, 2 * Stride, Stride, ImageData, NumBytes);
+			imageOut1 = new VideoImage(SampleTime + dtSubInterval, Width, Height - imageOut0.Height, BytesPerPixel, 2 * Stride, 0, ImageData, NumBytes);
 		}
 	}
 }
