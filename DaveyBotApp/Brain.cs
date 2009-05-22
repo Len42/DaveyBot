@@ -130,7 +130,9 @@ namespace DaveyBot
 				// and a delay defined by the user.
 				// NOTE: NoteLagAdjust is subtracted, not added, so it will appear as a
 				// positive number in the Settings dialog.
-				m_dtNoteDelay = new TimeSpan(m_eyes.VideoFrameInterval.Ticks * m_noteFinder.NumFramesDelay
+				// NOTE: Use half of VideoFrameInterval because we're de-interlacing the video
+				// and analyzing two images for each incoming video frame.
+				m_dtNoteDelay = new TimeSpan((m_eyes.VideoFrameInterval.Ticks/2) * m_noteFinder.NumFramesDelay
 									- Properties.Settings.Default.NoteLagAdjust * TimeSpan.TicksPerMillisecond);
 				m_fDelayStrum = Properties.Settings.Default.DelayStrum;
 				m_fStrumPending = false;
