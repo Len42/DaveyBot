@@ -87,9 +87,6 @@ namespace DaveyBot
 		}
 		private FrameGrabber m_frameGrabber;
 
-		/// <summary>Are the Brain and Fingers playing the game?</summary>
-		private bool m_fPlayingGame = false;
-
 		// "Lights" to indicate button presses & strums
 		// These ones are from the Brain.
 		// They light up when notes are detected.
@@ -349,7 +346,7 @@ namespace DaveyBot
 				fEnabled = true;
 			}
 			btnGrabFrames.Enabled = fEnabled;
-			btnGrabFrames.Text = fGrab ? "&Grab Frames" : "Stop &Grabbing";
+			btnGrabFrames.Text = fGrab ? "&Grab Frames" : "Stop &Grab";
 		}
 
 		/// <summary>
@@ -386,7 +383,7 @@ namespace DaveyBot
 			}
 			else
 			{
-				if (m_fPlayingGame)
+				if (m_brain.IsRunning)
 					StopPlaying();
 				m_eyes.StopVideo();
 			}
@@ -400,13 +397,12 @@ namespace DaveyBot
 		/// <param name="e"></param>
 		private void btnPlay_Click(object sender, EventArgs e)
 		{
-			if (!m_fPlayingGame)
+			if (!m_brain.IsRunning)
 			{
 				if (m_eyes.IsVideoPlaying)
 				{
 					m_fingers.Start();
 					m_brain.Start();
-					m_fPlayingGame = true;
 				}
 			}
 			else
@@ -423,7 +419,7 @@ namespace DaveyBot
 		/// </summary>
 		private void StopPlaying()
 		{
-			if (m_fPlayingGame)
+			if (m_brain.IsRunning)
 			{
 				m_fingers.Stop();
 				m_brain.Stop();
@@ -440,7 +436,6 @@ namespace DaveyBot
 				m_fBlue2 = false;
 				m_fOrange2 = false;
 				m_fStrum2 = false;
-				m_fPlayingGame = false;
 			}
 			Invalidate(rectPaint);
 			Invalidate(rectPaint2);
