@@ -216,7 +216,7 @@ namespace DaveyBot
 		/// <remarks>
 		/// <para>Decide what to do based on the current state.
 		/// Signal those actions by sending events which will be handled by the Fingers class.</para>
-		///<para>If new notes were found, play them. But there's a twist:
+		/// <para>If new notes were found, play them. But there's a twist:
 		/// If DelayStrum is true, wait one frame before playing the note.
 		/// That's because sometimes there are multiple notes, but some of them
 		/// are detected one frame later than others. We need to play them simultaneously.</para>

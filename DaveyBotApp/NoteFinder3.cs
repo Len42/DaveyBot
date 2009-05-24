@@ -110,8 +110,8 @@ namespace DaveyBot
 		/// Check a given image region to see if a note is sitting there.
 		/// </summary>
 		/// <remarks>
-		/// <para>This method checks a small rectangle at the end of the note area.
-		/// If there are enough "on" pixels then there is something there!</para>
+		/// This method checks a small rectangle at the end of the note area.
+		/// If there are enough "on" pixels then there is something there!
 		/// </remarks>
 		/// <seealso cref="DetectNote"/>
 		/// <param name="note">State of the particular note (green, red, etc.)

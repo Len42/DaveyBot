@@ -133,9 +133,9 @@ namespace DaveyBot
 		/// Send a command out the comm port to press some buttons on the guitar.
 		/// </summary>
 		/// <remarks>
-		/// <para>Most of the buttons maintain their pressed/not-pressed state
+		/// Most of the buttons maintain their pressed/not-pressed state
 		/// until the next command is sent, except the strum button will only be
-		/// pressed momentarily.</para>
+		/// pressed momentarily.
 		/// </remarks>
 		/// <todo>The overdrive control and whammy bar are not yet supported.</todo>
 		/// <param name="ev">Specifies which buttons to press and release</param>
