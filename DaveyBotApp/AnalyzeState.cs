@@ -39,6 +39,12 @@ namespace DaveyBot
 		public bool PrevFound { get { return fPrevFound; } set { fPrevFound = value; } }
 		private bool fPrevFound = false;
 
+		/// <summary>Last time this note turned on (video frame counter)</summary>
+		/// <remarks>Used by some <see cref="NoteFinder"/> subclasses to prevent
+		/// notes flickering on and off.</remarks>
+		public uint FrameStart { get { return iFrameStart; } set { iFrameStart = value; } }
+		private uint iFrameStart = 0;
+
 		/// <summary>Did this note just appear now?</summary>
 		public bool TurnedOn { get { return !fPrevFound && fFound; } }
 
