@@ -36,6 +36,18 @@ namespace DaveyBot
 	class NoteFinder5 : NoteFinder
 	{
 		// Note definitions
+		private NoteDef1 m_notedefGreen = new NoteDef1(250, 160, 7, 3, 0, 184, 0);
+		private NoteDef1 m_notedefGreenFollow = new NoteDef1(253, 157, 7, 3, 0, 184, 0);
+		private NoteDef1 m_notedefRed = new NoteDef1(302, 159, 7, 3, 184, 0, 0);
+		private NoteDef1 m_notedefRedFollow = new NoteDef1(303, 156, 7, 3, 184, 0, 0);
+		private NoteDef1 m_notedefYellow = new NoteDef1(357, 158, 7, 3, 184, 165, 0);
+		private NoteDef1 m_notedefYellowFollow = new NoteDef1(357, 155, 7, 3, 184, 165, 0);
+		private NoteDef1 m_notedefBlue = new NoteDef1(412, 159, 7, 3, 0, 0, 184);
+		private NoteDef1 m_notedefBlueFollow = new NoteDef1(411, 156, 7, 3, 0, 0, 184);
+		private NoteDef1 m_notedefOrange = new NoteDef1(464, 160, 7, 3, 184, 165, 0);
+		private NoteDef1 m_notedefOrangeFollow = new NoteDef1(461, 157, 7, 3, 184, 165, 0);
+
+#if false
 		private NoteDef1 m_notedefGreen = new NoteDef1(250, 160, 7, 2, 0, 200, 0);
 		private NoteDef1 m_notedefGreenFollow = new NoteDef1(252, 158, 7, 2, 0, 200, 0);
 		private NoteDef1 m_notedefRed = new NoteDef1(302, 159, 7, 2, 200, 0, 0);
@@ -46,7 +58,7 @@ namespace DaveyBot
 		private NoteDef1 m_notedefBlueFollow = new NoteDef1(411, 157, 7, 2, 0, 0, 200);
 		private NoteDef1 m_notedefOrange = new NoteDef1(464, 160, 7, 2, 200, 170, 0);
 		private NoteDef1 m_notedefOrangeFollow = new NoteDef1(462, 158, 7, 2, 200, 170, 0);
-
+#endif
 		override public int NumFramesDelay { get { return 12; } }
 
 		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
