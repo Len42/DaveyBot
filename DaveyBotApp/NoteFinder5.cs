@@ -27,18 +27,25 @@ namespace DaveyBot
 	/// A note-detection algorithm for Rock Band.
 	/// </summary>
 	/// <remarks>
-	/// This algorithm looks for bright pixels.
+	/// <para>This algorithm looks for bright pixels in a small area.</para>
+	/// <para>Also, when a note "turns off", it checks the immediately following area
+	/// to see if the note is actually finished. This avoids erroneous on-offs caused
+	/// by dark spots in the notes.</para>
 	/// </remarks>
-	/// <todo>Also look for an immediately following note, to prevent erroneous off-on's</todo>
 	/// <seealso cref="NoteDef1"/>
 	class NoteFinder5 : NoteFinder
 	{
 		// Note definitions
 		private NoteDef1 m_notedefGreen = new NoteDef1(250, 160, 7, 2, 0, 200, 0);
+		private NoteDef1 m_notedefGreenFollow = new NoteDef1(252, 158, 7, 2, 0, 200, 0);
 		private NoteDef1 m_notedefRed = new NoteDef1(302, 159, 7, 2, 200, 0, 0);
+		private NoteDef1 m_notedefRedFollow = new NoteDef1(303, 157, 7, 2, 200, 0, 0);
 		private NoteDef1 m_notedefYellow = new NoteDef1(357, 158, 7, 2, 200, 170, 0);
+		private NoteDef1 m_notedefYellowFollow = new NoteDef1(357, 156, 7, 2, 200, 170, 0);
 		private NoteDef1 m_notedefBlue = new NoteDef1(412, 159, 7, 2, 0, 0, 200);
+		private NoteDef1 m_notedefBlueFollow = new NoteDef1(411, 157, 7, 2, 0, 0, 200);
 		private NoteDef1 m_notedefOrange = new NoteDef1(464, 160, 7, 2, 200, 170, 0);
+		private NoteDef1 m_notedefOrangeFollow = new NoteDef1(462, 158, 7, 2, 200, 170, 0);
 
 		override public int NumFramesDelay { get { return 12; } }
 
@@ -48,11 +55,23 @@ namespace DaveyBot
 
 		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
 		{
-			DetectNote(state.FrameNum, state.Green, m_notedefGreen, image);
-			DetectNote(state.FrameNum, state.Red, m_notedefRed, image);
-			DetectNote(state.FrameNum, state.Yellow, m_notedefYellow, image);
-			DetectNote(state.FrameNum, state.Blue, m_notedefBlue, image);
-			DetectNote(state.FrameNum, state.Orange, m_notedefOrange, image);
+			DetectNote(state.FrameNum, state.Green, m_notedefGreen, m_notedefGreenFollow, image);
+			DetectNote(state.FrameNum, state.Red, m_notedefRed, m_notedefRedFollow, image);
+			DetectNote(state.FrameNum, state.Yellow, m_notedefYellow, m_notedefYellowFollow, image);
+			DetectNote(state.FrameNum, state.Blue, m_notedefBlue, m_notedefBlueFollow, image);
+			DetectNote(state.FrameNum, state.Orange, m_notedefOrange, m_notedefOrangeFollow, image);
+		}
+
+		private void DetectNote(uint iFrame,
+								NoteState note,
+								NoteDef1 notedef,
+								NoteDef1 notedefFollow,
+								VideoImage image)
+		{
+			DetectNoteHelper(iFrame, note, notedef, image);
+			// If the note seems to have ended, check the immediately following area to make sure.
+			if (!note.Found && note.PrevFound)
+				DetectNoteHelper(iFrame, note, notedefFollow, image);
 		}
 
 		/// <summary>
@@ -68,10 +87,10 @@ namespace DaveyBot
 		/// which will be updated if that note is detected</param>
 		/// <param name="notedef">Description of the note being sought</param>
 		/// <param name="image">Image bitmap</param>
-		private unsafe void DetectNote(uint iFrame,
-										NoteState note,
-										NoteDef1 notedef,
-										VideoImage image)
+		private unsafe void DetectNoteHelper(uint iFrame,
+											NoteState note,
+											NoteDef1 notedef,
+											VideoImage image)
 		{
 			//note.RValue = 0;
 			//note.GValue = 0;
