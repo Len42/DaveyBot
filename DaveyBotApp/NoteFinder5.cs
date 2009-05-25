@@ -49,10 +49,6 @@ namespace DaveyBot
 
 		override public int NumFramesDelay { get { return 12; } }
 
-		/// <summary>Minimum length of a note, in frames.</summary>
-		/// <remarks>This helps to avoid glitches where a note is lost then re-found.</remarks>
-		private const uint m_cframeMinNoteLength = 3;
-
 		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
 		{
 			DetectNote(state.FrameNum, state.Green, m_notedefGreen, m_notedefGreenFollow, image);
@@ -96,49 +92,36 @@ namespace DaveyBot
 			//note.GValue = 0;
 			//note.BValue = 0;
 
-			if (note.PrevFound && iFrame - note.FrameStart < m_cframeMinNoteLength)
+			// Scan a specified region of the bitmap.
+			int xStart = notedef.xLeft;
+			int yStart = notedef.yTop;
+			yStart = image.Height - yStart - notedef.dy; // flip top-bottom
+			byte* pbBuf = (byte*)image.ImageData;
+			int cb1Pix = image.BytesPerPixel;
+			int cbImageStride = image.Stride;
+			int ibStart = image.Start + yStart * cbImageStride + xStart * cb1Pix;
+			int cbRow = notedef.dx * cb1Pix;
+			//int rTotal = 0, gTotal = 0, bTotal = 0;
+			for (int yCur = yStart; yCur < yStart + notedef.dy; yCur++)
 			{
-				// We're holding the current note until a few frames have passed.
-				note.Found = true;
-			}
-			else
-			{
-				// Look for a note.
-				// Scan a specified region of the bitmap.
-				int xStart = notedef.xLeft;
-				int yStart = notedef.yTop;
-				yStart = image.Height - yStart - notedef.dy; // flip top-bottom
-				byte* pbBuf = (byte*)image.ImageData;
-				int cb1Pix = image.BytesPerPixel;
-				int cbImageStride = image.Stride;
-				int ibStart = image.Start + yStart * cbImageStride + xStart * cb1Pix;
-				int cbRow = notedef.dx * cb1Pix;
-				//int rTotal = 0, gTotal = 0, bTotal = 0;
-				for (int yCur = yStart; yCur < yStart + notedef.dy; yCur++)
+				int ibEnd = ibStart + cbRow;
+				for (int ib = ibStart; ib < ibEnd; ib += cb1Pix)
 				{
-					int ibEnd = ibStart + cbRow;
-					for (int ib = ibStart; ib < ibEnd; ib += cb1Pix)
+					if (pbBuf[ib] >= notedef.bMin
+						&& pbBuf[ib + 1] >= notedef.gMin
+						&& pbBuf[ib + 2] >= notedef.rMin)
 					{
-						if (pbBuf[ib] >= notedef.bMin
-							&& pbBuf[ib + 1] >= notedef.gMin
-							&& pbBuf[ib + 2] >= notedef.rMin)
-						{
-							note.Found = true;
-							// DEBUG: Mark found pixels
-							pbBuf[ib] = 255;
-							pbBuf[ib + 1] = 0;
-							pbBuf[ib + 2] = 255;
-							// DEBUG: Should quit when first pixel is found, for efficiency,
-							// but let's mark all the bright pixels for testing purposes.
-							//break;
-						}
+						note.Found = true;
+						// DEBUG: Mark found pixels
+						//pbBuf[ib] = 255;
+						//pbBuf[ib + 1] = 0;
+						//pbBuf[ib + 2] = 255;
+						// DEBUG: Should quit when first pixel is found, for efficiency,
+						// but let's mark all the bright pixels for testing purposes.
+						//break;
 					}
-					ibStart += cbImageStride;
 				}
-
-				// Keep track of when this note started so we can enforce a minimum note length.
-				if (note.Found && !note.PrevFound)
-					note.FrameStart = iFrame;
+				ibStart += cbImageStride;
 			}
 
 			// NOTE: Cannot distinguish between strummed notes and hammer-ons.
