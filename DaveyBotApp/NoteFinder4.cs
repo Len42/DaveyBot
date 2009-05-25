@@ -33,11 +33,11 @@ namespace DaveyBot
 	class NoteFinder4 : NoteFinder
 	{
 		// Note definitions
-		private NoteDef1 m_notedefGreen = new NoteDef1(250, 160, 7, 2, 0, 200, 0);
-		private NoteDef1 m_notedefRed = new NoteDef1(302, 159, 7, 2, 200, 0, 0);
-		private NoteDef1 m_notedefYellow = new NoteDef1(357, 158, 7, 2, 200, 170, 0);
-		private NoteDef1 m_notedefBlue = new NoteDef1(412, 159, 7, 2, 0, 0, 200);
-		private NoteDef1 m_notedefOrange = new NoteDef1(464, 160, 7, 2, 200, 170, 0);
+		private NoteDef1 m_notedefGreen = new NoteDef1(250, 160, 7, 3, 0, 200, 0);
+		private NoteDef1 m_notedefRed = new NoteDef1(302, 159, 7, 3, 200, 0, 0);
+		private NoteDef1 m_notedefYellow = new NoteDef1(357, 158, 7, 3, 200, 170, 0);
+		private NoteDef1 m_notedefBlue = new NoteDef1(412, 159, 7, 3, 0, 0, 200);
+		private NoteDef1 m_notedefOrange = new NoteDef1(464, 160, 7, 3, 200, 170, 0);
 
 		override public int NumFramesDelay { get { return 12; } }
 
