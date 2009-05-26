@@ -182,15 +182,15 @@ namespace DaveyBot
 			// DEBUG: Mark detected notes on the live video frame.
 			Color clrFill;
 			clrFill = m_state.Green.Found ? clrYes : clrNo;
-			FillRect(234 - 12, 24, 364 + 24, 10, clrFill, frame);
+			FillRect(234 - 12, 24, 194, 5, clrFill, frame);
 			clrFill = m_state.Red.Found ? clrYes : clrNo;
-			FillRect(297 - 12, 24, 364 + 24, 10, clrFill, frame);
+			FillRect(297 - 12, 24, 194, 5, clrFill, frame);
 			clrFill = m_state.Yellow.Found ? clrYes : clrNo;
-			FillRect(360 - 12, 24, 364 + 24, 10, clrFill, frame);
+			FillRect(360 - 12, 24, 194, 5, clrFill, frame);
 			clrFill = m_state.Blue.Found ? clrYes : clrNo;
-			FillRect(423 - 12, 24, 364 + 24, 10, clrFill, frame);
+			FillRect(423 - 12, 24, 194, 5, clrFill, frame);
 			clrFill = m_state.Orange.Found ? clrYes : clrNo;
-			FillRect(482 - 12, 24, 364 + 24, 10, clrFill, frame);
+			FillRect(482 - 12, 24, 194, 5, clrFill, frame);
 
 			// Figure out which buttons to press based on the analysis.
 			ExecuteActions(frame.SampleTime);
