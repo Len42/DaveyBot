@@ -34,10 +34,6 @@ namespace DaveyBot
 	/// </remarks>
 	public class Brain
 	{
-		// Colours for superimposed rectangles that indicate notes
-		private static Color clrYes = Color.FromArgb(0, 255, 0);
-		private static Color clrNo = Color.Black;
-
 		/// <summary>
 		/// The video capture object supplying the images to be analyzed
 		/// </summary>
@@ -94,6 +90,15 @@ namespace DaveyBot
 		/// </summary>
 		/// <seealso cref="m_fDelayStrum"/>
 		private bool m_fStrumPending = false;
+
+		// Superimposed rectangles that indicate when notes are found
+		private static Rectangle rectGreen = new Rectangle(222, 194, 24, 5);
+		private static Rectangle rectRed = new Rectangle(285, 194, 24, 5);
+		private static Rectangle rectYellow = new Rectangle(348, 194, 24, 5);
+		private static Rectangle rectBlue = new Rectangle(411, 194, 24, 5);
+		private static Rectangle rectOrange = new Rectangle(460, 194, 24, 5);
+		private static Color clrYes = Color.FromArgb(0, 255, 0);
+		private static Color clrNo = Color.Black;
 
 		/// <summary>
 		/// Event that signals a note or notes are to be played.
@@ -180,17 +185,11 @@ namespace DaveyBot
 			AnalyzeFrame(frame, m_state);
 
 			// DEBUG: Mark detected notes on the live video frame.
-			Color clrFill;
-			clrFill = m_state.Green.Found ? clrYes : clrNo;
-			FillRect(234 - 12, 24, 194, 5, clrFill, frame);
-			clrFill = m_state.Red.Found ? clrYes : clrNo;
-			FillRect(297 - 12, 24, 194, 5, clrFill, frame);
-			clrFill = m_state.Yellow.Found ? clrYes : clrNo;
-			FillRect(360 - 12, 24, 194, 5, clrFill, frame);
-			clrFill = m_state.Blue.Found ? clrYes : clrNo;
-			FillRect(423 - 12, 24, 194, 5, clrFill, frame);
-			clrFill = m_state.Orange.Found ? clrYes : clrNo;
-			FillRect(482 - 12, 24, 194, 5, clrFill, frame);
+			frame.FillRect(rectGreen, m_state.Green.Found ? clrYes : clrNo);
+			frame.FillRect(rectRed, m_state.Red.Found ? clrYes : clrNo);
+			frame.FillRect(rectYellow, m_state.Yellow.Found ? clrYes : clrNo);
+			frame.FillRect(rectBlue, m_state.Blue.Found ? clrYes : clrNo);
+			frame.FillRect(rectOrange, m_state.Orange.Found ? clrYes : clrNo);
 
 			// Figure out which buttons to press based on the analysis.
 			ExecuteActions(frame.SampleTime);
@@ -276,64 +275,6 @@ namespace DaveyBot
 						tWhen);
 			}
 			// TODO: overdrive, whammy bar
-		}
-
-		/// <summary>
-		/// Splat a coloured rectangle onto a bitmap.
-		/// </summary>
-		/// <remarks>
-		/// This is used to flash rectangles onto the video image stream to indicate
-		/// notes that are detected.
-		/// </remarks>
-		/// <param name="x">Rectangle left position</param>
-		/// <param name="dx">Rectangle width</param>
-		/// <param name="y">Rectangle top position</param>
-		/// <param name="dy">Rectangle height</param>
-		/// <param name="clr">Rectangle colour</param>
-		/// <param name="frame">Video image bitmap</param>
-		private unsafe void FillRect(int x, int dx, int y, int dy, Color clr, VideoImage frame)
-		{
-			byte* pbBuf = (byte*)frame.ImageData;
-			byte R = clr.R; // cache these values because they're used in loops
-			byte G = clr.G;
-			byte B = clr.B;
-
-			if (frame.Width <= 0 || frame.Height <= 0 || frame.BytesPerPixel <= 0 || frame.Stride <= 0)
-			{
-				// Error - video sizes not initialized
-				// (don't throw an exception for these errors because they may repeat on every video frame)
-			}
-			else if (x < 0 || x + dx >= frame.Width || y < 0 || y + dy >= frame.Height)
-			{
-				// Error - invalid rectangle coords
-			}
-			else if (frame.BytesPerPixel != 3)
-			{
-				// Error - we can't handle this video format
-			}
-			else
-			{
-				// Flip top & bottom
-				y = frame.Height - y - dy;
-				int ibCur;
-				int ibStart;
-				int ibEnd;
-				int cb1Pix = frame.BytesPerPixel;
-				int cbStride = frame.Stride;
-				ibStart = frame.Start + y * frame.Stride + x * cb1Pix;
-				for (int i = 0; i < dy; i++)
-				{
-					ibEnd = ibStart + dx * cb1Pix;
-					for (ibCur = ibStart; ibCur < ibEnd; ibCur += cb1Pix)
-					{
-						// NOTE: Pixel byte order is B, G, R
-						pbBuf[ibCur] = B;
-						pbBuf[ibCur + 1] = G;
-						pbBuf[ibCur + 2] = R;
-					}
-					ibStart += cbStride;
-				}
-			}
 		}
 
 		/// <summary>

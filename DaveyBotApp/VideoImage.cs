@@ -21,6 +21,7 @@ THE SOFTWARE.
 */
 using System;
 using System.Runtime.InteropServices;
+using System.Drawing;
 
 namespace DaveyBot
 {
@@ -104,6 +105,58 @@ namespace DaveyBot
 			// the second image starts on the first scan line!
 			imageOut0 = new VideoImage(SampleTime, Width, Height / 2, BytesPerPixel, 2 * Stride, Stride, ImageData, NumBytes);
 			imageOut1 = new VideoImage(SampleTime + dtSubInterval, Width, Height - imageOut0.Height, BytesPerPixel, 2 * Stride, 0, ImageData, NumBytes);
+		}
+
+		/// <summary>
+		/// Splat a coloured rectangle onto a bitmap.
+		/// </summary>
+		/// <remarks>
+		/// This is used to flash rectangles onto the video image stream to indicate
+		/// notes that are detected.
+		/// </remarks>
+		/// <param name="rect">Rectangular to draw</param>
+		/// <param name="clr">Rectangle colour</param>
+		public unsafe void FillRect(Rectangle rect, Color clr)
+		{
+			byte* pbBuf = (byte*)ImageData;
+			byte R = clr.R; // cache these values because they're used in loops
+			byte G = clr.G;
+			byte B = clr.B;
+
+			if (Width <= 0 || Height <= 0 || BytesPerPixel <= 0 || Stride <= 0)
+			{
+				// Error - video sizes not initialized
+				// (don't throw an exception for these errors because they may repeat on every video frame)
+			}
+			else if (rect.Left < 0 || rect.Right >= Width || rect.Top < 0 || rect.Bottom >= Height)
+			{
+				// Error - invalid rectangle coords
+			}
+			else if (BytesPerPixel != 3)
+			{
+				// Error - we can't handle this video format
+			}
+			else
+			{
+				// Flip top & bottom
+				int y = Height - rect.Bottom;
+				int ibCur;
+				int ibStart;
+				int ibEnd;
+				ibStart = Start + y * Stride + rect.Left * BytesPerPixel;
+				for (int i = 0; i < rect.Height; i++)
+				{
+					ibEnd = ibStart + rect.Width * BytesPerPixel;
+					for (ibCur = ibStart; ibCur < ibEnd; ibCur += BytesPerPixel)
+					{
+						// NOTE: Pixel byte order is B, G, R
+						pbBuf[ibCur] = B;
+						pbBuf[ibCur + 1] = G;
+						pbBuf[ibCur + 2] = R;
+					}
+					ibStart += Stride;
+				}
+			}
 		}
 	}
 }
