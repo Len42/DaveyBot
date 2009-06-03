@@ -95,12 +95,14 @@
     </Compile>
     <Compile Include="NoteDef1.cs" />
     <Compile Include="NoteDef2.cs" />
+    <Compile Include="NoteDef6.cs" />
     <Compile Include="NoteFinder.cs" />
     <Compile Include="NoteFinder1.cs" />
     <Compile Include="NoteFinder2.cs" />
     <Compile Include="NoteFinder3.cs" />
     <Compile Include="NoteFinder4.cs" />
     <Compile Include="NoteFinder5.cs" />
+    <Compile Include="NoteFinder6.cs" />
     <Compile Include="NoteFinderTest.cs" />
     <Compile Include="ObjectUtils.cs" />
     <Compile Include="Program.cs" />

@@ -32,23 +32,24 @@ namespace DaveyBot
 	/// to see if the note is actually finished. This avoids erroneous on-offs caused
 	/// by dark spots in the notes.</para>
 	/// </remarks>
-	/// <seealso cref="NoteDef1"/>
-	class NoteFinder5 : NoteFinder
+	/// <seealso cref="NoteDef6"/>
+	class NoteFinder6 : NoteFinder
 	{
 		// Note definitions
 
-#if false
 		// first try
-		private NoteDef1 m_notedefGreen = new NoteDef1(250, 160, 7, 2, 0, 200, 0);
-		private NoteDef1 m_notedefGreenFollow = new NoteDef1(252, 158, 7, 2, 0, 200, 0);
-		private NoteDef1 m_notedefRed = new NoteDef1(302, 159, 7, 2, 200, 0, 0);
-		private NoteDef1 m_notedefRedFollow = new NoteDef1(303, 157, 7, 2, 200, 0, 0);
-		private NoteDef1 m_notedefYellow = new NoteDef1(357, 158, 7, 2, 200, 170, 0);
-		private NoteDef1 m_notedefYellowFollow = new NoteDef1(357, 156, 7, 2, 200, 170, 0);
-		private NoteDef1 m_notedefBlue = new NoteDef1(412, 159, 7, 2, 0, 0, 200);
-		private NoteDef1 m_notedefBlueFollow = new NoteDef1(411, 157, 7, 2, 0, 0, 200);
-		private NoteDef1 m_notedefOrange = new NoteDef1(464, 160, 7, 2, 200, 170, 0);
-		private NoteDef1 m_notedefOrangeFollow = new NoteDef1(462, 158, 7, 2, 200, 170, 0);
+#if false
+		private const int nHysteresis = 30;
+		private NoteDef6 m_notedefGreen = new NoteDef6(250, 160, 7, 2, 0, 200, 0, nHysteresis);
+		private NoteDef6 m_notedefGreenFollow = new NoteDef6(252, 158, 7, 2, 0, 200, 0, nHysteresis);
+		private NoteDef6 m_notedefRed = new NoteDef6(302, 159, 7, 2, 200, 0, 0, nHysteresis);
+		private NoteDef6 m_notedefRedFollow = new NoteDef6(303, 157, 7, 2, 200, 0, 0, nHysteresis);
+		private NoteDef6 m_notedefYellow = new NoteDef6(357, 158, 7, 2, 200, 170, 0, nHysteresis);
+		private NoteDef6 m_notedefYellowFollow = new NoteDef6(357, 156, 7, 2, 200, 170, 0, nHysteresis);
+		private NoteDef6 m_notedefBlue = new NoteDef6(412, 159, 7, 2, 0, 0, 200, nHysteresis);
+		private NoteDef6 m_notedefBlueFollow = new NoteDef6(411, 157, 7, 2, 0, 0, 210, nHysteresis);
+		private NoteDef6 m_notedefOrange = new NoteDef6(464, 160, 7, 2, 200, 170, 0, nHysteresis);
+		private NoteDef6 m_notedefOrangeFollow = new NoteDef6(462, 158, 7, 2, 200, 170, 0, nHysteresis);
 #endif
 
 #if false
@@ -65,17 +66,19 @@ namespace DaveyBot
 		private NoteDef1 m_notedefOrangeFollow = new NoteDef1(461, 157, 7, 3, 170, 150, 0);
 #endif
 
+		// TODO: Try hysteresis = 0 - should get 99%, matching NoteFinder5
 		// higher thresholds, note height = 3
-		private NoteDef1 m_notedefGreen = new NoteDef1(250, 160, 7, 3, 0, 220, 0);
-		private NoteDef1 m_notedefGreenFollow = new NoteDef1(253, 157, 7, 3, 0, 220, 0);
-		private NoteDef1 m_notedefRed = new NoteDef1(302, 159, 7, 3, 220, 0, 0);
-		private NoteDef1 m_notedefRedFollow = new NoteDef1(303, 156, 7, 3, 220, 0, 0);
-		private NoteDef1 m_notedefYellow = new NoteDef1(357, 158, 7, 3, 220, 170, 0);
-		private NoteDef1 m_notedefYellowFollow = new NoteDef1(357, 155, 7, 3, 220, 170, 0);
-		private NoteDef1 m_notedefBlue = new NoteDef1(412, 159, 7, 3, 0, 0, 220);
-		private NoteDef1 m_notedefBlueFollow = new NoteDef1(411, 156, 7, 3, 0, 0, 220);
-		private NoteDef1 m_notedefOrange = new NoteDef1(464, 160, 7, 3, 220, 170, 0);
-		private NoteDef1 m_notedefOrangeFollow = new NoteDef1(461, 157, 7, 3, 220, 170, 0);
+		private const int nHysteresis = 20;
+		private NoteDef6 m_notedefGreen = new NoteDef6(250, 160, 7, 3, 0, 220, 0, nHysteresis);
+		private NoteDef6 m_notedefGreenFollow = new NoteDef6(253, 157, 7, 3, 0, 220, 0, nHysteresis);
+		private NoteDef6 m_notedefRed = new NoteDef6(302, 159, 7, 3, 220, 0, 0, nHysteresis);
+		private NoteDef6 m_notedefRedFollow = new NoteDef6(303, 156, 7, 3, 220, 0, 0, nHysteresis);
+		private NoteDef6 m_notedefYellow = new NoteDef6(357, 158, 7, 3, 220, 170, 0, nHysteresis);
+		private NoteDef6 m_notedefYellowFollow = new NoteDef6(357, 155, 7, 3, 220, 170, 0, nHysteresis);
+		private NoteDef6 m_notedefBlue = new NoteDef6(412, 159, 7, 3, 0, 0, 220, nHysteresis);
+		private NoteDef6 m_notedefBlueFollow = new NoteDef6(411, 156, 7, 3, 0, 0, 220, nHysteresis);
+		private NoteDef6 m_notedefOrange = new NoteDef6(464, 160, 7, 3, 220, 170, 0, nHysteresis);
+		private NoteDef6 m_notedefOrangeFollow = new NoteDef6(461, 157, 7, 3, 220, 170, 0, nHysteresis);
 
 #if false
 		// lower thresholds, note height = 3
@@ -90,7 +93,6 @@ namespace DaveyBot
 		private NoteDef1 m_notedefOrange = new NoteDef1(464, 160, 7, 3, 184, 165, 0);
 		private NoteDef1 m_notedefOrangeFollow = new NoteDef1(461, 157, 7, 3, 184, 165, 0);
 #endif
-
 		override public int NumFramesDelay { get { return 12; } }
 
 		override public void AnalyzeImage(VideoImage image, AnalyzeState state)
@@ -104,8 +106,8 @@ namespace DaveyBot
 
 		private void DetectNote(uint iFrame,
 								NoteState note,
-								NoteDef1 notedef,
-								NoteDef1 notedefFollow,
+								NoteDef6 notedef,
+								NoteDef6 notedefFollow,
 								VideoImage image)
 		{
 			DetectNoteHelper(iFrame, note, notedef, image);
@@ -129,7 +131,7 @@ namespace DaveyBot
 		/// <param name="image">Image bitmap</param>
 		private unsafe void DetectNoteHelper(uint iFrame,
 											NoteState note,
-											NoteDef1 notedef,
+											NoteDef6 notedef,
 											VideoImage image)
 		{
 			//note.RValue = 0;
@@ -151,18 +153,22 @@ namespace DaveyBot
 				int ibEnd = ibStart + cbRow;
 				for (int ib = ibStart; ib < ibEnd; ib += cb1Pix)
 				{
-					if (pbBuf[ib] >= notedef.bMin
-						&& pbBuf[ib + 1] >= notedef.gMin
-						&& pbBuf[ib + 2] >= notedef.rMin)
+					if ((notedef.bMin == 0 || pbBuf[ib] >= notedef.bMin)
+						&& (notedef.gMin == 0 || pbBuf[ib + 1] >= notedef.gMin)
+						&& (notedef.rMin == 0 || pbBuf[ib + 2] >= notedef.rMin))
 					{
+						// A bright, shiny, new note has been found.
 						note.Found = true;
-						// DEBUG: Mark found pixels
-						//pbBuf[ib] = 255;
-						//pbBuf[ib + 1] = 0;
-						//pbBuf[ib + 2] = 255;
-						// DEBUG: Should quit when first pixel is found, for efficiency,
-						// but let's mark all the bright pixels for testing purposes.
-						//break;
+						break;
+					}
+					else if ((notedef.bMin == 0 || pbBuf[ib] >= notedef.bMin - notedef.nHysteresis)
+						&& (notedef.gMin == 0 || pbBuf[ib + 1] >= notedef.gMin - notedef.nHysteresis)
+						&& (notedef.rMin == 0 || pbBuf[ib + 2] >= notedef.rMin - notedef.nHysteresis))
+					{
+						// Bright enough to sustain an existing note, but
+						// not enough to recognize a new note.
+						note.Found = note.PrevFound;
+						break;
 					}
 				}
 				ibStart += cbImageStride;

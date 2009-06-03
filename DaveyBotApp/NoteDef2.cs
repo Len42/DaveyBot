@@ -22,7 +22,7 @@ THE SOFTWARE.
 namespace DaveyBot
 {
 	/// <summary>
-	/// Defines positions of notes on the screen for <see cref="NoteFinder2"/>.
+	/// Defines positions of notes on the screen for various <see cref="NoteFinder"/> subclasses.
 	/// </summary>
 	/// <remarks>
 	/// NoteDef2 defines the bright "ends" of the notes.

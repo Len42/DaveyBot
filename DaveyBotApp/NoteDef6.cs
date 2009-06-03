@@ -22,22 +22,25 @@ THE SOFTWARE.
 namespace DaveyBot
 {
 	/// <summary>
-	/// Defines positions of notes on the screen for various <see cref="NoteFinder"/> subclasses.
+	/// Defines positions of notes on the screen for <see cref="NoteFinder6"/>.
 	/// </summary>
-	class NoteDef1
+	class NoteDef6
 	{
 		// Position of the note
 		public int xLeft;
 		public int yTop;
 		public int dx;
 		public int dy;
-		// Red, green & blue thresholds for the note
+		// Red, green & blue thresholds for a note to be detected
 		// If zero, ignore that colour
 		public int rMin;
 		public int gMin;
 		public int bMin;
+		// Hysteresis: Once a note is detected, it will stay "on" until the
+		// colors drop a bit below the "on" threshold.
+		public int nHysteresis;
 
-		public NoteDef1(int xLeft, int yTop, int dx, int dy, int rMin, int gMin, int bMin)
+		public NoteDef6(int xLeft, int yTop, int dx, int dy, int rMin, int gMin, int bMin, int nHysteresis)
 		{
 			this.xLeft = xLeft;
 			this.yTop = yTop;
@@ -46,6 +49,7 @@ namespace DaveyBot
 			this.rMin = rMin;
 			this.gMin = gMin;
 			this.bMin = bMin;
+			this.nHysteresis = nHysteresis;
 		}
 	}
 }
