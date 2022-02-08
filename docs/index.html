@@ -2,8 +2,174 @@
 <html>
 <head>
 <title>DaveyBot</title>
+<link rel="stylesheet" type="text/css" href="/css/main.css">
+<link rel="stylesheet" type="text/css" media="handheld" href="/css/mainhh.css">
 </head>
 <body>
-coming soon
+
+<div id="header">
+<h1>DaveyBot</h1>
+<p>A computer that plays <strong>Guitar Hero</strong> &amp; <strong>Rock Band</strong></p>
+
+<ul class="linkline">
+<li class="first"><a href="#overview">Overview</a></li>
+<li><a href="#software">Software</a></li>
+<li><a href="#arduino">Arduino</a></li>
+<li><a href="#hardware">Hardware</a></li>
+<li><a href="#success">Success!</a></li>
+<li><a href="/">Home</a></li>
+</ul>
+
+</div>
+
+<div id="main">
+
+<p>Updated: 10/05/2009</p>
+
+<h2><a name="overview"></a>Overview</h2>
+
+<p>I have hooked up my computer to a
+<a
+href="http://www.redoctane.com/Guitar-Hero/Xbox-360/Guitar-Hero-World-Tour-Wireless-Guitar-Controller-Xbox-360"><em>Guitar
+Hero controller</em></a>,
+and written software to play
+<a href="http://www.rockband.com/"><em>Rock Band</em></a>
+and <a href="http://www.guitarhero.com/"><em>Guitar Hero.</em></a>
+Why? Well, if you have to ask, you probably wouldn't get it.</p>
+
+<p>I'm not the first to make a <em>Guitar Hero</em> ‘bot. <a
+href="http://autoguitarhero.com/">Here's one</a> and <a
+href="http://arduinoguitarhero.blogspot.com/">here's another</a>. I'm a
+software guy and I already have a computer that handles video input (to record TV
+shows), so I did most of the work in software. The software should eventually work
+with different games. (I have <em>Rock Band, Rock Band 2</em> and <em>Guitar Hero
+World Tour.</em>)</p>
+
+<p>The general idea is:</p>
+<ol>
+<li>The computer receives the game video from the Xbox 360.</li>
+<li>Software on the computer analyzes the video to figure out when to play the notes.</li>
+<li>The software sends commands via USB to an interface module in the <em>Guitar Hero</em>
+controller.</li>
+<li>The module in the guitar simulates the button presses to play the notes.</li>
+</ol>
+
+<p>DaveyBot is named after a fictional guitar hero.</p>
+
+<h3>Current Status</h3>
+<p><em>Current status:</em> DaveyBot is up and running! It's not perfect, though.
+The software needs more work.
+Currently it plays <em>Rock Band</em> and <em>Rock Band 2</em> on Expert difficulty.</p>
+
+<h3>Pictures</h3>
+<p>There are more pictures, some with annotations,
+<a href="http://www.flickr.com/photos/36366608@N06/sets/72157616598971021/">here</a>.
+
+<h3>Download</h3>
+<p>Download software, firmware, schematics <a href="/download/#daveybot">here</a>.</p>
+
+<h2><a name="software"></a>Software</h2>
+
+<p>The DaveyBot software is written in C#. It uses DirectShow to
+capture the video input (via the <a href="http://directshownet.sourceforge.net/">DirectShowNet</a>
+C# library). Each video frame is analyzed to see if a note is approaching the
+strike line. If so, DaveyBot sends a command out through a comm port, to tell
+the guitar to play a note.</p>
+
+<p>Here's a shot of the DaveyBot software in action with <em>Rock
+Band 2</em>:</p>
+
+<p><img src="screen1.jpg" alt="screenshot"></p>
+
+<p>The coloured blocks overlaid on the image and above it show
+the notes that are detected and played. You can see that the image is quite
+blurry. It's a challenge to get the software to accurately identify the notes. You
+may also notice that DaveyBot is losing the game. That's because it wasn't
+hooked up to a guitar yet!</p>
+
+<p>The note-detection logic isn't perfect yet. It sometimes misses notes and it
+tends to get confused by other things that flash onto the screen.
+There's more work to do before it can play all songs perfectly.</p>
+
+<p>Another challenge was the DirectShow API for video capture (part
+of Windows DirectX). I think that API was designed by a Sudoku fanatic who didn't
+want anyone else to use it. I figured out how to navigate the maze
+corresponding to my TV tuner card, but I'm not confident that the software would
+work on a computer with different video capture hardware.</p>
+
+<p>So far I've been using <em>Rock Band 2</em> but I should be
+able to tweak the software to play <em>Guitar Hero</em> as well. Some of the specialized
+features don't work (solo buttons and slider bar) but I hope to add support for
+overdrive/star power.</p>
+
+<h2><a name="arduino"></a>Arduino</h2>
+
+<p>To interpret the commands from the computer and simulate
+pressing the buttons, I'm using an <a href="http://arduino.cc/">Arduino</a>
+microcontroller embedded in the guitar. Actually I'm using a <a
+href="http://www.ladyada.net/make/boarduino/">Boarduino</a> because it's small
+enough to fit in the guitar, it's powered by the USB connection from the
+computer, and its pinout fits nicely on a prototyping board.</p>
+
+<p>The Arduino is connected to the computer via USB, but under
+Windows it appears as a serial comm port. The commands sent from the computer
+are each a single byte, with each bit representing the on/off state of one of
+the switches (fret buttons, strum bar, whammy bar, tilt switch).</p>
+
+<p>The software running on the Arduino is simple. When it
+receives a command byte from the computer, it turns the appropriate output pins
+on or off. The strum bar is handled specially. It is turned on momentarily, then
+off again after a brief time. The whammy bar also needs special handling
+because it has to be moved continually, but I haven't implemented that yet.</p>
+
+<p>Here's a video of the Boarduino in action, receiving
+commands from the computer and driving a set of LEDs in lieu of the guitar
+switches:</p>
+
+<object type="application/x-shockwave-flash" width="400" height="300" data="http://www.flickr.com/apps/video/stewart.swf?v=70645" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"> <param name="flashvars" value="intl_lang=en-us&amp;photo_secret=72c53fc81c&amp;photo_id=3436012497"></param> <param name="movie" value="http://www.flickr.com/apps/video/stewart.swf?v=70645"></param> <param name="bgcolor" value="#000000"></param> <param name="allowFullScreen" value="true"></param><embed type="application/x-shockwave-flash" src="http://www.flickr.com/apps/video/stewart.swf?v=70645" bgcolor="#000000" allowfullscreen="true" flashvars="intl_lang=en-us&amp;photo_secret=72c53fc81c&amp;photo_id=3436012497" height="300" width="400"></embed></object>
+
+<h2><a name="hardware"></a>Hardware Interface</h2>
+
+<p>Besides the Boarduino, the interface module in the guitar
+also has a set of opto-isolators, to keep the computer and Boarduino electrically
+isolated from the guitar controller's circuitry. I found a pair of quad
+optocoupler chips (ILQ1) that do the trick nicely.</p>
+
+<p>Here's my schematic for the interface board:</p>
+
+<p><img src="schematic.png" alt="schematic"></p>
+
+<p>Here's what the interface module looks like installed in the guitar controller.
+(<a href="http://www.flickr.com/photos/36366608@N06/3460809599/in/set-72157616598971021/">Click here</a>
+for an annotated version of the picture.)
+
+<p><img src="hardware.jpg" alt="hardware"></p>
+
+<p>The outputs from my interface board are connected to the spots on the logic board
+where the wires from the guitar's switches come in. There's a twisty USB connector bringing
+the Boarduino's USB connection to the outside of the guitar. (If I'd been thinking ahead
+I would have just put the Boarduino's USB connector on a short cable when I put it together.)
+There's also a reset switch for the Boarduino, which is needed to start it running after
+it's plugged into the computer.</p>
+
+<p>When it's not plugged into the computer, the guitar controller functions normally.</p>
+
+<p>One thing that doesn't work yet is the whammy bar. It's not necessary for playing the game,
+but it can be used to increase your score. The whammy bar uses a potentiometer hooked up as
+a voltage divider, and I haven't figured out how to control it using an optocoupler.</p>
+
+<h2><a name="success"></a>Success!</h2>
+
+<p>Here's the result of DaveyBot's first full system test:</p>
+<p><img src="success.jpg"></p>
+
+<p>Here's how DaveyBot does playing <em>"Painkiller"</em> on expert difficulty.
+Not perfect yet, but quite good.</p>
+<p><img src="painkiller1.jpg"></p>
+<p><img src="painkiller2.jpg"></p>
+
+</div>
+
 </body>
+
 </html>
