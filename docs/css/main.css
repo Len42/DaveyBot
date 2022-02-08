@@ -7,7 +7,7 @@ body {
 
 #header {
 	color: rgb(168,200,220);
-	background: rgb(51,103,153) url(/css/header.jpg) no-repeat top right;
+	background: rgb(51,103,153) url(css/header.jpg) no-repeat top right;
 	padding: 1em 0.75em 0.1em 0.75em;
 	margin: 0;
 }
@@ -69,7 +69,7 @@ h1 {
 
 #main h1 {
 	color: rgb(51,103,153);
-	background: url(/css/ding.gif) no-repeat center left;
+	background: url(css/ding.gif) no-repeat center left;
 	padding-left: 20px;
 }
 
@@ -81,7 +81,7 @@ h2 {
 
 #main h2 {
 	color: rgb(51,103,153);
-	background: url(/css/ding.gif) no-repeat center left;
+	background: url(css/ding.gif) no-repeat center left;
 	padding-left: 20px;
 }
 
@@ -94,7 +94,7 @@ h3 {
 
 #main h3 {
 	color: rgb(51,103,153);
-	background: url(/css/ding.gif) no-repeat center left;
+	background: url(css/ding.gif) no-repeat center left;
 	padding-left: 20px;
 }
 
@@ -112,12 +112,12 @@ img.hd {
 }
 
 ul {
-	list-style-image: url(/css/dings.gif);
+	list-style-image: url(css/dings.gif);
 }
 
 dl {
 	list-style: outside;
-	list-style-image: url(/css/dings.gif);
+	list-style-image: url(css/dings.gif);
 }
 dt {
 	display: list-item;
@@ -148,7 +148,7 @@ ul.linkline {
 .linkline li.first {
 	/* First item has a ">" dingbat. Note that this is done as a background bitmap
 	 not a list-style-image because <li> doesn't show its dingbats when it's inline! */
-	background: url(/css/dingsh.gif) no-repeat left center;
+	background: url(css/dingsh.gif) no-repeat left center;
 	padding-left: 14px;
 	border-left: none;
 }
