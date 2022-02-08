@@ -6,6 +6,8 @@ _A software/hardware system that plays "Rock Band", by Len Popp_
 
 See [http://www.lmp.dyndns.org/daveybot/daveybot.html](http://www.lmp.dyndns.org/daveybot/daveybot.html) for general information about DaveyBot.
 
+**Please note** that this project is many years old and is not compatible with current versions of Xbox, Windows, Arduino, etc.
+
 ## DaveyBot Software
 
 The DaveyBot program is written in C#. Its source code is in the "DaveyBotApp" directory.
