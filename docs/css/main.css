@@ -81,7 +81,7 @@ h2 {
 
 #main h2 {
 	color: rgb(51,103,153);
-	background: url(css/ding.gif) no-repeat center left;
+	background: url(/DaveyBot/css/ding.gif) no-repeat center left;
 	padding-left: 20px;
 }
 
@@ -94,7 +94,7 @@ h3 {
 
 #main h3 {
 	color: rgb(51,103,153);
-	background: url(css/ding.gif) no-repeat center left;
+	background: url(ding.gif) no-repeat center left;
 	padding-left: 20px;
 }
 
